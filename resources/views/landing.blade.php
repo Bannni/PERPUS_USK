@@ -1,225 +1,196 @@
 @extends('layouts.base')
 
-@section('title', 'Readowl Bookstore - Jelajahi Ribuan Buku Pilihan')
+@section('title', 'Readowl Bookstore - Find Your Book')
 
 @section('content')
-<div class="min-h-screen bg-[#FAF7F2] text-[#2D231E]">
+<div class="min-h-screen bg-[#181614] text-[#2D231E]">
 
-    <!-- NAVBAR -->
-    <header class="border-b border-[#EFE5D7] bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Brand -->
-            <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#EFE4D6] flex items-center justify-center text-[#7A5034]">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2C8 2 4 5 4 10c0 4 2 8 8 12 6-4 8-8 8-12 0-5-4-8-8-8z"/>
-                        <circle cx="9" cy="9" r="2.5" fill="#7A5034"/>
-                        <circle cx="15" cy="9" r="2.5" fill="#7A5034"/>
-                        <path d="m12 12 1 2-2 0 1-2"/>
-                    </svg>
-                </div>
-                <span class="font-serif text-2xl font-bold tracking-tight text-[#5F3D27]">Readowl</span>
-            </a>
-
-            <!-- Nav Links -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#7A6B60]">
-                <a href="{{ route('catalog') }}" class="hover:text-[#5F3D27] transition">Katalog Rak Buku</a>
-                <a href="#featured" class="hover:text-[#5F3D27] transition">Koleksi Terpopuler</a>
-                <a href="#features" class="hover:text-[#5F3D27] transition">Fitur Unggulan</a>
-                <a href="#about" class="hover:text-[#5F3D27] transition">Tentang Kami</a>
-            </nav>
-
-            <!-- Auth Buttons -->
-            <div class="flex items-center gap-3">
-                @auth
-                    <a href="{{ route('catalog') }}" class="px-4 py-2 text-xs md:text-sm font-semibold text-[#5F3D27] bg-[#F1E8DC] hover:bg-[#E7DBCB] rounded-xl transition flex items-center gap-2">
-                        <i data-lucide="book-open" class="w-4 h-4 text-[#7A5034]"></i>
-                        <span>Perpustakaan Saya</span>
+    <!-- HERO SECTION (EDITORIAL CURATION / FIND YOUR BOOK - MATCHING REFERENCE IMAGE) -->
+    <section class="p-3 sm:p-6 lg:p-8">
+        <div class="bg-[#F0EDE6] rounded-[24px] sm:rounded-[36px] overflow-hidden border border-[#DDD7CD] shadow-2xl min-h-[92vh] flex flex-col justify-between p-6 sm:p-10 lg:p-14 relative">
+            
+            <!-- Top Header Inside Editorial Frame -->
+            <header class="flex items-center justify-between text-xs tracking-widest uppercase font-semibold text-[#5C534B]">
+                <!-- Brand Left -->
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('home') }}" class="font-serif text-xl sm:text-2xl font-bold tracking-tighter text-[#1C1815] hover:opacity-80 transition">
+                        READOWL
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="p-2 text-[#9C8B7E] hover:text-red-600 rounded-xl transition" title="Keluar">
-                            <i data-lucide="log-out" class="w-4 h-4"></i>
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 text-xs md:text-sm font-medium text-[#5F3D27] hover:text-[#3D2719] transition">
-                        Masuk
-                    </a>
-                    <a href="{{ route('register') }}" class="px-5 py-2.5 text-xs md:text-sm font-semibold text-white bg-[#7A5034] hover:bg-[#5F3D27] rounded-xl shadow-sm transition">
-                        Daftar Gratis
-                    </a>
-                @endauth
-            </div>
-        </div>
-    </header>
-
-    <!-- FLASH MESSAGES -->
-    @if(session('success'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center gap-2">
-                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
-
-    @if(session('info'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl flex items-center gap-2">
-                <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
-                <span>{{ session('info') }}</span>
-            </div>
-        </div>
-    @endif
-
-    <!-- HERO SECTION -->
-    <section class="py-16 md:py-24 overflow-hidden relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                
-                <!-- Left Column: Copywriting -->
-                <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFE5D7] text-[#7A5034] text-xs font-semibold tracking-wide uppercase">
-                        <span>✨ Toko Buku & Perpustakaan Digital</span>
-                    </div>
-
-                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#4A3222] leading-[1.15]">
-                        Ruang Nyaman untuk Menjelajah <span class="text-[#8C603E] italic">Ribuan Kisah</span> & Pengetahuan.
-                    </h1>
-
-                    <p class="text-base sm:text-lg text-[#7A6B60] max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                        Rasakan kehangatan perpustakaan klasik dalam balutan teknologi modern. Kelola rak buku virtual pribadi, pantau progres membaca, dan dapatkan inspirasi setiap hari.
-                    </p>
-
-                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                        <a href="{{ route('catalog') }}" class="w-full sm:w-auto px-7 py-3.5 bg-[#7A5034] hover:bg-[#5F3D27] text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 group">
-                            <span>Buka Rak Buku Saya</span>
-                            <span class="group-hover:translate-x-1 transition">→</span>
-                        </a>
-                        <a href="{{ route('register') }}" class="w-full sm:w-auto px-7 py-3.5 bg-[#EFE4D6] hover:bg-[#E5D7C5] text-[#5F3D27] font-semibold text-sm rounded-xl transition text-center">
-                            Gabung Menjadi Pembaca
-                        </a>
-                    </div>
-
-                    <!-- Micro Stats -->
-                    <div class="pt-6 border-t border-[#EFE5D7] grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 text-center lg:text-left">
-                        <div>
-                            <span class="block font-serif text-2xl font-bold text-[#5F3D27]">{{ $totalBooks }}+</span>
-                            <span class="text-xs text-[#8C7A6D]">Koleksi Terkurasi</span>
-                        </div>
-                        <div>
-                            <span class="block font-serif text-2xl font-bold text-[#5F3D27]">100%</span>
-                            <span class="text-xs text-[#8C7A6D]">Visual Rak 3D</span>
-                        </div>
-                        <div>
-                            <span class="block font-serif text-2xl font-bold text-[#5F3D27]">XAMPP</span>
-                            <span class="text-xs text-[#8C7A6D]">perpus_db Siap</span>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Right Column: Interactive 3D Shelf Preview -->
-                <div class="lg:col-span-6">
-                    <div class="bg-[#FAF7F2] border border-[#E9DDD0] rounded-3xl p-6 sm:p-8 shadow-xl relative">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-[#A8988B]">Pratinjau Rak Buku</span>
-                                <h3 class="font-serif text-xl font-bold text-[#5F3D27]">Koleksi Pilihan Hari Ini</h3>
+                <!-- Center Subtitle / Tag -->
+                <div class="hidden sm:block text-[11px] text-[#8C8277] tracking-[0.25em]">
+                    THE EDITORIAL ARCHIVE • VOL. 01
+                </div>
+
+                <!-- Right Nav Links -->
+                <div class="flex items-center gap-5 sm:gap-7">
+                    <a href="{{ route('catalog') }}" class="hover:text-[#1C1815] transition hidden md:inline">Catalog</a>
+                    <a href="#featured" class="hover:text-[#1C1815] transition hidden md:inline">Featured</a>
+                    @auth
+                        <a href="{{ route('catalog') }}" class="px-4 py-1.5 bg-[#1C1815] text-[#F0EDE6] rounded-full text-xs font-semibold hover:bg-[#3D332B] transition">
+                            My Library
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="hover:text-[#1C1815] transition">Login</a>
+                        <a href="{{ route('register') }}" class="px-4 py-1.5 bg-[#1C1815] text-[#F0EDE6] rounded-full text-xs font-semibold hover:bg-[#3D332B] transition">
+                            Register
+                        </a>
+                    @endauth
+                </div>
+            </header>
+
+            <!-- Main Big Editorial Headline (FIND YOUR BOOK) -->
+            <div class="text-center my-8 sm:my-12">
+                <span class="block text-[11px] sm:text-xs tracking-[0.3em] uppercase text-[#8C8277] font-medium mb-3">
+                    PART 1
+                </span>
+                <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-[#1C1815] uppercase font-light leading-[1.05]">
+                    FIND YOUR BOOK
+                </h1>
+                <p class="text-xs sm:text-sm text-[#73685E] max-w-lg mx-auto mt-4 font-normal tracking-wide">
+                    Temukan inspirasi melalui kurasi buku pilihan, tata rak bacaan impianmu, dan nikmati setiap halaman cerita.
+                </p>
+            </div>
+
+            <!-- THE BOOK SPINES & ARTWORK ROW (Direct Match to Reference) -->
+            <div class="w-full overflow-x-auto pb-4 pt-6">
+                <div class="min-w-[860px] lg:min-w-0 flex items-end justify-center gap-1.5 sm:gap-2.5 px-4 h-[330px] sm:h-[380px] border-b-2 border-[#1C1815]">
+                    
+                    <!-- Book 1: Pink Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-9 sm:w-11 h-[270px] sm:h-[310px] bg-[#EFA4B8] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1.5 text-center cursor-pointer relative" title="The Year of Less">
+                        <span class="text-[9px] [writing-mode:vertical-rl] rotate-180 tracking-widest text-[#6E2E40] uppercase truncate font-medium">ESSAYS & LIFE</span>
+                        <span class="w-1.5 h-1.5 bg-[#6E2E40] rounded-full mx-auto mb-1"></span>
+                    </a>
+
+                    <!-- Book 2: Green Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-8 sm:w-10 h-[210px] sm:h-[240px] bg-[#2E5E43] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1.5 text-center cursor-pointer relative" title="Nature Chronicles">
+                        <span class="text-[8px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-[#A2CDB5] uppercase truncate">BOTANICA</span>
+                        <span class="text-[8px] text-[#A2CDB5] font-mono">02</span>
+                    </a>
+
+                    <!-- Book 3: Bold Orange "PRINTABLE" -->
+                    <a href="{{ route('catalog') }}" class="group w-10 sm:w-13 h-[280px] sm:h-[330px] bg-[#FF4F1A] rounded-t-sm shadow-lg hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between items-center py-3 text-center cursor-pointer relative" title="Printable Design">
+                        <span class="font-bold text-white text-xs sm:text-sm tracking-[0.25em] [writing-mode:vertical-rl] rotate-180 uppercase font-sans">
+                            PRINTABLE
+                        </span>
+                        <span class="w-2 h-0.5 bg-white opacity-80"></span>
+                    </a>
+
+                    <!-- Book 4: Charcoal Slim Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-6 sm:w-7 h-[270px] sm:h-[310px] bg-[#252525] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1 text-center cursor-pointer relative" title="Minimal Architecture">
+                        <span class="text-[7px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-[#CCCCCC] uppercase truncate">MONOLITH</span>
+                        <span class="text-[7px] text-[#CCCCCC] font-mono">IV</span>
+                    </a>
+
+                    <!-- Book 5: Soft Pink "BOOKSHA" -->
+                    <a href="{{ route('catalog') }}" class="group w-9 sm:w-11 h-[290px] sm:h-[340px] bg-[#F4A7C1] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-2 text-center cursor-pointer relative" title="Booksha Collection">
+                        <span class="text-[9px] font-bold tracking-widest [writing-mode:vertical-rl] rotate-180 text-[#541E30] uppercase">BOOKSHA</span>
+                        <span class="text-[8px] [writing-mode:vertical-rl] rotate-180 text-[#541E30]/70 truncate">PHOTOGRAPHIC</span>
+                    </a>
+
+                    <!-- Book 6: Leaning Mauve Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-6 sm:w-7 h-[280px] sm:h-[320px] bg-[#C1879B] rounded-t-sm shadow-md hover:rotate-3 transition-transform duration-300 flex flex-col justify-between p-1 text-center cursor-pointer origin-bottom-left rotate-[8deg] -mr-1 z-10" title="The Geometry of Holding Hands">
+                        <span class="text-[7px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-white uppercase truncate">POETRY</span>
+                        <span class="w-1 h-1 bg-white rounded-full mx-auto"></span>
+                    </a>
+
+                    <!-- Book 7: CENTERPIECE (Forward-Facing Front Cover Art Book) -->
+                    <a href="{{ route('catalog') }}" class="group w-36 sm:w-44 md:w-48 h-[250px] sm:h-[290px] bg-[#1E2C3A] rounded-t-md shadow-2xl hover:-translate-y-2 transition-transform duration-300 flex flex-col justify-between p-3.5 sm:p-4 text-center cursor-pointer relative border-t-2 border-x-2 border-[#15202B] z-20 mx-1" title="The Art of Curation">
+                        <!-- White Inner Frame with Classical Statue Illustration -->
+                        <div class="w-full h-full border border-white/70 p-2 sm:p-2.5 flex flex-col justify-between items-center bg-[#18232F]">
+                            <div class="w-full flex-1 flex items-center justify-center overflow-hidden py-1">
+                                <!-- Classical Sculpture SVG / Graphic -->
+                                <svg class="w-16 sm:w-20 h-28 sm:h-36 text-white/90 drop-shadow" viewBox="0 0 100 140" fill="none" stroke="currentColor">
+                                    <!-- Stylized classical statue contour -->
+                                    <path d="M50 15 C45 15, 38 22, 38 32 C38 42, 44 48, 48 52 C42 55, 35 62, 35 75 C35 90, 42 110, 42 125 L58 125 C58 110, 65 90, 65 75 C65 62, 58 55, 52 52 C56 48, 62 42, 62 32 C62 22, 55 15, 50 15 Z" fill="#E8EEF5" stroke="#0F1822" stroke-width="2"/>
+                                    <ellipse cx="50" cy="30" rx="8" ry="11" fill="#C9D6E4"/>
+                                    <path d="M44 58 C44 70, 40 85, 40 100" stroke="#0F1822" stroke-width="2"/>
+                                    <path d="M56 58 C56 70, 60 85, 60 100" stroke="#0F1822" stroke-width="2"/>
+                                </svg>
                             </div>
-                            <a href="{{ route('catalog') }}" class="text-xs font-semibold text-[#7A5034] hover:underline flex items-center gap-1">
-                                <span>Lihat Semua</span>
-                                <span>→</span>
-                            </a>
+                            <span class="text-[9px] sm:text-[10px] tracking-[0.2em] uppercase font-serif text-white/90">
+                                MONOGRAPH
+                            </span>
                         </div>
+                    </a>
 
-                        <!-- 3D Shelf Preview Container -->
-                        <div class="relative pt-6 pb-0 px-2 sm:px-4 flex items-end justify-around">
-                            @foreach($featuredBooks->take(4) as $book)
-                                <a href="{{ route('catalog') }}" class="book-wrapper shrink-0 group">
-                                    <div class="w-20 sm:w-24 aspect-[2/3] book-cover">
-                                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
-                                    </div>
-                                    <div class="mt-2 text-center w-20 sm:w-24">
-                                        <p class="text-[10px] font-bold text-[#4A3222] truncate">{{ $book->title }}</p>
-                                        <p class="text-[9px] text-[#8C7A6D] truncate">{{ $book->author }}</p>
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
+                    <!-- Book 8: Slim Coral Red Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-5 sm:w-6 h-[290px] sm:h-[340px] bg-[#E84338] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1 text-center cursor-pointer relative" title="1984 - George Orwell">
+                        <span class="text-[7px] [writing-mode:vertical-rl] rotate-180 tracking-widest text-white uppercase font-bold truncate">ORWELL</span>
+                        <span class="text-[7px] text-white font-mono">84</span>
+                    </a>
 
-                        <!-- 3D Shelf Ledge -->
-                        <div class="shelf-surface mt-1"></div>
-                        <div class="shelf-face"></div>
+                    <!-- Book 9: Cobalt Blue Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-8 sm:w-9 h-[270px] sm:h-[315px] bg-[#1E5799] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1.5 text-center cursor-pointer relative" title="Clean Architecture">
+                        <span class="text-[8px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-white uppercase truncate">BLUE ARCHIVE</span>
+                        <span class="w-1.5 h-1.5 bg-white/70 rounded-full mx-auto"></span>
+                    </a>
 
-                        <div class="mt-6 text-center">
-                            <p class="text-xs text-[#8C7A6D]">
-                                Klik buku di atas atau <a href="{{ route('catalog') }}" class="font-bold text-[#7A5034] underline">kunjungi halaman katalog</a> untuk melihat rak buku lengkap (Currently reading, Next up, Finished).
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                    <!-- Book 10: Wide Grey Spine "S,M,L,XL" -->
+                    <a href="{{ route('catalog') }}" class="group w-12 sm:w-15 h-[300px] sm:h-[355px] bg-[#E1E4E8] rounded-t-sm shadow-lg hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between items-center py-3 text-center cursor-pointer relative border-l border-black/10" title="S,M,L,XL Architecture">
+                        <div class="text-[7px] text-[#4F5660] font-sans">O.M.A.</div>
+                        <span class="font-extrabold text-[#111827] text-xs sm:text-sm tracking-[0.2em] [writing-mode:vertical-rl] rotate-180 uppercase font-sans">
+                            S,M,L,XL
+                        </span>
+                        <span class="w-2 h-0.5 bg-black/40"></span>
+                    </a>
 
-            </div>
-        </div>
-    </section>
+                    <!-- Book 11: Leaning Dark Indigo Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-6 sm:w-7 h-[250px] sm:h-[285px] bg-[#3B3054] rounded-t-sm shadow-md hover:rotate-0 transition-transform duration-300 flex flex-col justify-between p-1 text-center cursor-pointer origin-bottom-right rotate-[6deg] -ml-1 z-10" title="Visible Signs">
+                        <span class="text-[7px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-[#D1C4E9] uppercase truncate font-medium">VISIBLE SIGNS</span>
+                        <span class="w-1 h-1 bg-[#D1C4E9] rounded-full mx-auto"></span>
+                    </a>
 
-    <!-- FEATURES SECTION -->
-    <section id="features" class="py-16 bg-[#F5EFEB] border-y border-[#EAE0D3]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-14">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#8A7463]">Keunggulan Readowl</span>
-                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-[#4A3222] mt-2">Dibuat Khusus untuk Pecinta Buku</h2>
-                <p class="text-sm sm:text-base text-[#7A6B60] mt-3">Nikmati kemudahan mengatur rak bacaan tanpa kehilangan estetika buku fisik yang menenangkan.</p>
-            </div>
+                    <!-- Book 12: Mustard Ochre Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-7 sm:w-8 h-[270px] sm:h-[310px] bg-[#EBB036] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1.5 text-center cursor-pointer relative" title="Design of Everyday Things">
+                        <span class="text-[8px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-[#4A3206] uppercase font-bold truncate">DESIGN</span>
+                        <span class="text-[7px] text-[#4A3206] font-mono">01</span>
+                    </a>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
-                <div class="bg-[#FAF7F2] p-7 rounded-2xl border border-[#E7DCCE] shadow-xs hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
-                        <i data-lucide="layers" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-serif text-xl font-bold text-[#4A3222] mb-2">Visual Rak 3D Skeuomorfik</h3>
-                    <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
-                        Tampilan rak kayu realistis dengan pencahayaan dan bayangan alami, menjadikan koleksi digital Anda terasa nyata.
-                    </p>
-                </div>
+                    <!-- Book 13: Vintage Dark Brown Leather Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-11 sm:w-13 h-[250px] sm:h-[295px] bg-[#38261F] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-2 text-center cursor-pointer relative border-x border-[#2A1C16]" title="The Lord of the Rings">
+                        <span class="text-[8px] [writing-mode:vertical-rl] rotate-180 tracking-widest text-[#E8D1B5] uppercase font-serif truncate">CLASSIC TALES</span>
+                        <span class="text-[8px] text-[#E8D1B5] font-serif">I • II</span>
+                    </a>
 
-                <!-- Card 2 -->
-                <div class="bg-[#FAF7F2] p-7 rounded-2xl border border-[#E7DCCE] shadow-xs hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
-                        <i data-lucide="bookmark" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-serif text-xl font-bold text-[#4A3222] mb-2">Manajemen Status Membaca</h3>
-                    <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
-                        Kategorikan buku ke dalam <em>Currently reading</em>, <em>Next up</em>, atau <em>Finished</em> lengkap dengan persentase halaman.
-                    </p>
-                </div>
+                    <!-- Book 14: Tall Orange Spine -->
+                    <a href="{{ route('catalog') }}" class="group w-7 sm:w-8 h-[290px] sm:h-[340px] bg-[#FF5E1E] rounded-t-sm shadow-md hover:-translate-y-3 transition-transform duration-300 flex flex-col justify-between p-1.5 text-center cursor-pointer relative" title="Logo Design Love">
+                        <span class="text-[8px] [writing-mode:vertical-rl] rotate-180 tracking-wider text-white uppercase font-bold truncate">IDENTITY</span>
+                        <span class="w-1.5 h-1.5 bg-white rounded-full mx-auto"></span>
+                    </a>
 
-                <!-- Card 3 -->
-                <div class="bg-[#FAF7F2] p-7 rounded-2xl border border-[#E7DCCE] shadow-xs hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
-                        <i data-lucide="database" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-serif text-xl font-bold text-[#4A3222] mb-2">Integrasi Database MySQL</h3>
-                    <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
-                        Tersambung langsung dengan MySQL di XAMPP melalui database <strong>perpus_db</strong> dengan skema tabel terstruktur.
-                    </p>
                 </div>
             </div>
+
+            <!-- Bottom Action & Indicator -->
+            <div class="flex flex-col sm:flex-row items-center justify-between pt-6 text-xs text-[#7A6E63] gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#1C1815] animate-pulse"></span>
+                    <span>Klik buku pada baris di atas untuk membuka katalog interaktif</span>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('catalog') }}" class="font-semibold text-[#1C1815] hover:underline flex items-center gap-1 group">
+                        <span>Buka Rak Buku 3D Lengkap</span>
+                        <span class="group-hover:translate-x-1 transition">→</span>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <!-- FEATURED BOOKS LIST -->
-    <section id="featured" class="py-16 md:py-20">
+    <section id="featured" class="py-20 bg-[#FAF7F2] text-[#2D231E]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#8A7463]">Koleksi Unggulan</span>
-                    <h2 class="font-serif text-3xl font-bold text-[#4A3222] mt-1">Buku Terpopuler di Toko</h2>
+                    <span class="text-xs font-bold uppercase tracking-widest text-[#8A7463]">Koleksi Terpopuler</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-[#1C1815] mt-1">Buku Pilihan Pembaca</h2>
                 </div>
                 <a href="{{ route('catalog') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#7A5034] hover:text-[#5F3D27]">
-                    <span>Buka Katalog Lengkap</span>
+                    <span>Lihat Semua di Rak 3D</span>
                     <span>→</span>
                 </a>
             </div>
@@ -245,36 +216,64 @@
         </div>
     </section>
 
-    <!-- CALL TO ACTION (CTA) -->
-    <section class="py-16 bg-[#EFE4D6] border-t border-[#DFD1BF]">
-        <div class="max-w-5xl mx-auto px-4 text-center">
-            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-[#4A3222]">Mulai Buat Rak Buku Impianmu Hari Ini</h2>
-            <p class="text-sm sm:text-base text-[#7A6B60] max-w-xl mx-auto mt-3">
-                Daftar sekarang untuk menyimpan daftar bacaan, memberi rating pada buku favorit, dan menjelajahi koleksi terlengkap.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-                <a href="{{ route('register') }}" class="px-8 py-3.5 bg-[#7A5034] hover:bg-[#5F3D27] text-white font-semibold text-sm rounded-xl shadow-md transition">
-                    Daftar Akun Baru
-                </a>
-                <a href="{{ route('catalog') }}" class="px-8 py-3.5 bg-white hover:bg-[#FAF7F2] text-[#5F3D27] border border-[#D8C7B4] font-semibold text-sm rounded-xl transition">
-                    Lihat Rak Buku Langsung
-                </a>
+    <!-- FEATURES SECTION -->
+    <section id="features" class="py-20 bg-[#F2EFE9] border-t border-[#E2DBD0] text-[#2D231E]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-14">
+                <span class="text-xs font-bold uppercase tracking-wider text-[#8A7463]">Keunggulan Readowl</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-[#1C1815] mt-2">Dibuat Khusus untuk Pecinta Buku</h2>
+                <p class="text-sm sm:text-base text-[#7A6B60] mt-3">Nikmati kemudahan mengatur rak bacaan tanpa kehilangan estetika buku fisik yang menenangkan.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-[#FAF7F2] p-8 rounded-2xl border border-[#E7DCCE] shadow-xs hover:shadow-md transition">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-[#1C1815] mb-2">Visual Rak 3D Skeuomorfik</h3>
+                    <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
+                        Tampilan rak kayu realistis dengan pencahayaan dan bayangan alami, menjadikan koleksi digital Anda terasa nyata.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-[#FAF7F2] p-8 rounded-2xl border border-[#E7DCCE] shadow-xs hover:shadow-md transition">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
+                        <i data-lucide="bookmark" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-[#1C1815] mb-2">Manajemen Status Membaca</h3>
+                    <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
+                        Kategorikan buku ke dalam <em>Currently reading</em>, <em>Next up</em>, atau <em>Finished</em> lengkap dengan persentase halaman.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-[#FAF7F2] p-8 rounded-2xl border border-[#E7DCCE] shadow-xs hover:shadow-md transition">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-[#1C1815] mb-2">Integrasi Database MySQL</h3>
+                    <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
+                        Tersambung langsung dengan MySQL di XAMPP melalui database <strong>perpus_db</strong> dengan skema tabel terstruktur.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-[#FAF7F2] border-t border-[#EAE0D3] py-8 text-center text-xs text-[#8C7A6D]">
+    <footer class="bg-[#181614] border-t border-[#2B2724] py-10 text-center text-xs text-[#8C8277]">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
-                <span class="font-serif font-bold text-sm text-[#5F3D27]">Readowl</span>
-                <span>• Toko Buku & Perpustakaan Digital</span>
+                <span class="font-serif font-bold text-sm text-[#F0EDE6]">READOWL</span>
+                <span>• Digital Bookstore & Library</span>
             </div>
-            <p>Database: <span class="font-mono text-[#7A5034]">perpus_db</span> (MySQL XAMPP) • Laravel 12</p>
+            <p>Database: <span class="font-mono text-[#D7BEA2]">perpus_db</span> (MySQL XAMPP) • Laravel 12</p>
             <div class="flex items-center gap-4">
-                <a href="{{ route('catalog') }}" class="hover:underline">Katalog</a>
-                <a href="{{ route('login') }}" class="hover:underline">Masuk</a>
-                <a href="{{ route('register') }}" class="hover:underline">Daftar</a>
+                <a href="{{ route('catalog') }}" class="hover:text-white transition">Katalog</a>
+                <a href="{{ route('login') }}" class="hover:text-white transition">Masuk</a>
+                <a href="{{ route('register') }}" class="hover:text-white transition">Daftar</a>
             </div>
         </div>
     </footer>
