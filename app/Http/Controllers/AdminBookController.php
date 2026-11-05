@@ -11,76 +11,79 @@ use Illuminate\Support\Facades\Storage;
 class AdminBookController extends Controller
 {
     /**
-     * Display admin dashboard and book CRUD management.
+     * Display a unified admin dashboard (Book CRUD, User Monitoring, Order Logs).
      */
     public function index(Request $request)
     {
+        $activeTab = $request->input('tab', 'books');
         $search = $request->input('q');
         $category = $request->input('category');
 
-        $query = Book::query();
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
+        // 1. Books query
+        $bookQuery = Book::query();
+        if ($search && $activeTab === 'books') {
+            $bookQuery->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('author', 'like', "%{$search}%")
                   ->orWhere('category', 'like', "%{$search}%");
             });
         }
-
         if ($category) {
-            $query->where('category', $category);
+            $bookQuery->where('category', $category);
         }
-
-        $books = $query->latest()->paginate(9)->withQueryString();
+        $books = $bookQuery->latest()->paginate(9, ['*'], 'books_page')->withQueryString();
         $categories = Book::select('category')->distinct()->pluck('category');
 
-        // Statistics
+        // 2. Users query
+        $userQuery = User::withCount(['orders' => function ($q) {
+            $q->where('status', 'completed');
+        }])->withSum(['orders' => function ($q) {
+            $q->where('status', 'completed');
+        }], 'total_price');
+
+        if ($search && $activeTab === 'users') {
+            $userQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+        $users = $userQuery->latest()->paginate(10, ['*'], 'users_page')->withQueryString();
+
+        // 3. Orders query
+        $orders = Order::with(['user', 'book'])->latest()->paginate(15, ['*'], 'orders_page')->withQueryString();
+
+        // Summary Statistics
         $totalBooks = Book::count();
         $totalOrders = Order::count();
         $totalRevenue = Order::where('status', 'completed')->sum('total_price');
-        $totalUsers = User::where('role', 'user')->count();
+        $totalUsers = User::count();
+        $totalMembers = User::where('role', 'user')->count();
+        $totalAdmins = User::where('role', 'admin')->count();
 
         return view('admin.dashboard', compact(
+            'activeTab',
             'books',
             'categories',
+            'users',
+            'orders',
             'totalBooks',
             'totalOrders',
             'totalRevenue',
             'totalUsers',
+            'totalMembers',
+            'totalAdmins',
             'search',
             'category'
         ));
     }
 
     /**
-     * Display user data monitoring for admin.
+     * Redirect to the dashboard user tab.
      */
-    public function users(?Request $request = null)
+    public function users()
     {
-        $request = $request ?? request();
-        $search = $request->input('q');
-
-        $query = User::withCount(['orders' => function ($q) {
-            $q->where('status', 'completed');
-        }])->withSum(['orders' => function ($q) {
-            $q->where('status', 'completed');
-        }], 'total_price');
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
-            });
-        }
-
-        $users = $query->latest()->paginate(10)->withQueryString();
-        $totalUsers = User::count();
-        $totalMembers = User::where('role', 'user')->count();
-        $totalAdmins = User::where('role', 'admin')->count();
-
-        return view('admin.users', compact('users', 'totalUsers', 'totalMembers', 'totalAdmins', 'search'));
+        return redirect()->route('admin.dashboard', ['tab' => 'users']);
     }
 
     /**
@@ -175,13 +178,10 @@ class AdminBookController extends Controller
     }
 
     /**
-     * View all transaction orders.
+     * Redirect to the dashboard orders tab.
      */
     public function orders()
     {
-        $orders = Order::with(['user', 'book'])->latest()->paginate(15);
-        $totalRevenue = Order::where('status', 'completed')->sum('total_price');
-
-        return view('admin.orders', compact('orders', 'totalRevenue'));
+        return redirect()->route('admin.dashboard', ['tab' => 'orders']);
     }
 }
