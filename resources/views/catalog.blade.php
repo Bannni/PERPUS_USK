@@ -257,7 +257,7 @@
 
         <!-- Footer Notice -->
         <div class="pt-8 mt-12 border-t border-[#EFE5D7] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9C8B7E] gap-2">
-            <p>© 2026 Readowl Bookstore • Terintegrasi dengan MySQL XAMPP (<span class="font-mono text-[#7A5034]">perpus_db</span>)</p>
+            <p>© 2026 Readowl Bookstore • Koleksi Buku Digital Terkurasi</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('shop') }}" class="hover:text-[#5F3D27] font-semibold text-[#7A5034]">Toko Buku (Shop)</a>
                 <span>•</span>

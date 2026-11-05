@@ -263,9 +263,9 @@
                     <div class="w-12 h-12 rounded-xl bg-[#EFE4D6] flex items-center justify-center text-[#7A5034] mb-5">
                         <i data-lucide="database" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="font-serif text-xl font-bold text-[#1C1815] mb-2">Integrasi Database MySQL</h3>
+                    <h3 class="font-serif text-xl font-bold text-[#1C1815] mb-2">Koleksi Terkurasi & Aman</h3>
                     <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
-                        Tersambung langsung dengan MySQL di XAMPP melalui database <strong>perpus_db</strong> dengan skema tabel terstruktur.
+                        Seluruh katalog buku dan lisensi pembelian Anda tersimpan rapi dan terproteksi dalam sistem modern.
                     </p>
                 </div>
             </div>
@@ -279,8 +279,9 @@
                 <span class="font-serif font-bold text-sm text-[#F0EDE6]">READOWL</span>
                 <span>• Digital Bookstore & Library</span>
             </div>
-            <p>Database: <span class="font-mono text-[#D7BEA2]">perpus_db</span> (MySQL XAMPP) • Laravel 12</p>
+            <p>© 2026 Readowl Bookstore • Dirancang untuk Pengalaman Membaca Terbaik</p>
             <div class="flex items-center gap-4">
+                <a href="{{ route('shop') }}" class="hover:text-white transition">Toko Buku</a>
                 <a href="{{ route('catalog') }}" class="hover:text-white transition">Katalog</a>
                 <a href="{{ route('login') }}" class="hover:text-white transition">Masuk</a>
                 <a href="{{ route('register') }}" class="hover:text-white transition">Daftar</a>

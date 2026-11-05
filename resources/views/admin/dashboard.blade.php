@@ -98,7 +98,7 @@
                     <i data-lucide="book" class="w-4 h-4 text-amber-400"></i>
                 </div>
                 <div class="font-serif text-3xl font-bold text-white tracking-tight">{{ $totalBooks }}</div>
-                <span class="text-[10px] text-amber-400/90 mt-1 block">Buku terdaftar di MySQL</span>
+                <span class="text-[10px] text-amber-400/90 mt-1 block">Buku terdaftar di katalog</span>
             </div>
 
             <!-- Card 2 -->
@@ -126,11 +126,11 @@
             <!-- Card 4 -->
             <div class="bg-gradient-to-b from-[#211E1A] to-[#1A1714] border border-[#383129] rounded-3xl p-5 shadow-lg relative overflow-hidden group">
                 <div class="flex items-center justify-between text-[#8E8070] mb-2">
-                    <span class="text-[11px] font-semibold uppercase tracking-wider">Database Terkoneksi</span>
-                    <i data-lucide="database" class="w-4 h-4 text-amber-300"></i>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider">Genre / Kategori</span>
+                    <i data-lucide="tags" class="w-4 h-4 text-amber-400"></i>
                 </div>
-                <div class="font-mono text-xl font-bold text-amber-300 tracking-tight">perpus_db</div>
-                <span class="text-[10px] text-[#A69785] mt-1 block">XAMPP MySQL Port 3306</span>
+                <div class="font-serif text-3xl font-bold text-white tracking-tight">{{ $categories->count() }}</div>
+                <span class="text-[10px] text-amber-400/90 mt-1 block">Klasifikasi genre aktif</span>
             </div>
         </div>
 

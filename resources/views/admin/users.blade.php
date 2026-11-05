@@ -39,7 +39,7 @@
             <div class="bg-gradient-to-b from-[#211E1A] to-[#1A1714] border border-[#383129] rounded-3xl p-5 shadow-lg">
                 <span class="text-[11px] font-semibold uppercase tracking-wider text-[#8E8070] block">Total Pengguna Terdaftar</span>
                 <span class="font-serif text-3xl font-bold text-white mt-1 block">{{ $totalUsers }}</span>
-                <span class="text-[10px] text-amber-400/80 mt-1 block">Tercatat di perpus_db</span>
+                <span class="text-[10px] text-amber-400/80 mt-1 block">Tercatat di sistem Readowl</span>
             </div>
 
             <div class="bg-gradient-to-b from-[#211E1A] to-[#1A1714] border border-[#383129] rounded-3xl p-5 shadow-lg">

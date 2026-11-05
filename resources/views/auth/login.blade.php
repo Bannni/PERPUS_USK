@@ -339,7 +339,7 @@
     <footer class="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between text-xs text-[#8C8075] pt-6 border-t border-[#E8E3D8] gap-3 z-10">
         <span>© 2026 Readowl Bookstore • Sistem Keanggotaan Terintegrasi</span>
         <div class="flex items-center gap-4">
-            <span class="font-mono text-[#5C534B]">MySQL perpus_db</span>
+            <span class="text-[#7A6E63]">Akses Aman & Terenkripsi</span>
             <span>•</span>
             <a href="{{ route('home') }}" class="hover:text-[#1C1815] transition">Beranda</a>
             <span>•</span>

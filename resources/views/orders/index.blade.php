@@ -279,7 +279,7 @@
     <!-- Footer -->
     <footer class="max-w-7xl mx-auto w-full pt-6 border-t border-[#E8E1D5] flex items-center justify-between text-xs text-[#8C8075]">
         <span>© 2026 Readowl Bookstore • Arsip Transaksi</span>
-        <span>MySQL: perpus_db</span>
+        <span>Sistem Kurasi Readowl</span>
     </footer>
 
 </div>
