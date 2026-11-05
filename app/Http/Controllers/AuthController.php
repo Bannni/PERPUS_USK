@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -16,7 +17,9 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect()->route('catalog');
+            return Auth::user()->isAdmin() 
+                ? redirect()->route('admin.dashboard') 
+                : redirect()->route('catalog');
         }
 
         return view('auth.login');
@@ -41,6 +44,10 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            if (Auth::user()->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'))->with('success', 'Selamat datang di Panel Admin Readowl, ' . Auth::user()->name . '!');
+            }
+
             return redirect()->intended(route('catalog'))->with('success', 'Selamat datang kembali, ' . Auth::user()->name . '!');
         }
 
@@ -55,7 +62,9 @@ class AuthController extends Controller
     public function showRegister()
     {
         if (Auth::check()) {
-            return redirect()->route('catalog');
+            return Auth::user()->isAdmin() 
+                ? redirect()->route('admin.dashboard') 
+                : redirect()->route('catalog');
         }
 
         return view('auth.register');
@@ -69,21 +78,35 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'phone' => ['required', 'string', 'min:10', 'max:15', 'regex:/^[0-9+]+$/'],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email ini sudah terdaftar.',
+            'phone.required' => 'Nomor telepon wajib diisi.',
+            'phone.min' => 'Nomor telepon minimal 10 digit.',
+            'phone.max' => 'Nomor telepon maksimal 15 digit.',
+            'phone.regex' => 'Nomor telepon hanya boleh berupa angka (dan tanda +).',
             'password.required' => 'Kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'],
             'password' => Hash::make($validated['password']),
+            'role' => 'user',
         ]);
 
         Auth::login($user);

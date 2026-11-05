@@ -7,8 +7,12 @@
     activeTab: '{{ $activeTab ?? 'shelves' }}',
     selectedBook: null,
     modalOpen: false,
+    checkoutMode: false,
+    buyQuantity: 1,
     openBook(book) {
         this.selectedBook = book;
+        this.checkoutMode = false;
+        this.buyQuantity = 1;
         this.modalOpen = true;
     }
 }">
@@ -54,6 +58,22 @@
                     <i data-lucide="newspaper" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
                     <span class="font-medium text-sm">News</span>
                 </a>
+
+                @auth
+                    <a href="{{ route('orders.index') }}" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
+                        <i data-lucide="receipt" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
+                        <span class="font-medium text-sm">Pesanan Saya</span>
+                    </a>
+
+                    @if(Auth::user()->isAdmin())
+                        <div class="pt-2">
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-[#1C1815] text-amber-300 font-semibold text-xs shadow-md hover:bg-black transition">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+                                <span>Studio Admin (CRUD)</span>
+                            </a>
+                        </div>
+                    @endif
+                @endauth
             </nav>
         </div>
 
@@ -120,6 +140,18 @@
     <!-- MAIN BOOKCASE CONTAINER (SCROLLABLE CANVAS) -->
     <main class="flex-1 md:h-full md:overflow-y-auto bg-[#FAF7F2] border border-[#EADECF] rounded-[32px] p-5 sm:p-7 md:p-8 lg:p-10 shadow-sm flex flex-col justify-between scroll-smooth">
         <div>
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between gap-3 shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                    <a href="{{ route('orders.index') }}" class="text-xs font-bold text-emerald-900 underline hover:no-underline">
+                        Lihat Pesanan Saya →
+                    </a>
+                </div>
+            @endif
+
             <!-- Top Controls: Tabs and Search Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <!-- Tabs: Shelves vs All Books -->
@@ -363,16 +395,76 @@
                             </div>
                         </div>
 
-                        <!-- Price & Action -->
-                        <div class="mt-6 pt-4 border-t border-[#E8DDCE] flex items-center justify-between">
-                            <div>
-                                <span class="text-[10px] text-[#8C7A6D] block">Harga Buku</span>
-                                <span class="text-lg font-bold text-[#7A5034]" x-text="'Rp ' + (selectedBook.price ? selectedBook.price.toLocaleString('id-ID') : '75.000')"></span>
+                        <!-- Price & Action / Checkout Section -->
+                        <div class="mt-6 pt-4 border-t border-[#E8DDCE]">
+                            <!-- State 1: Normal View -->
+                            <div x-show="!checkoutMode" class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-[10px] text-[#8C7A6D] block">Harga Buku</span>
+                                    <span class="text-lg font-bold text-[#7A5034]" x-text="'Rp ' + (selectedBook.price ? selectedBook.price.toLocaleString('id-ID') : '75.000')"></span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button type="button" @click="alert('Mode membaca buku dibuka.');" class="px-3.5 py-2 bg-[#EFE5D7] hover:bg-[#E5D7C5] text-[#5F3D27] text-xs font-semibold rounded-xl transition">
+                                        Baca
+                                    </button>
+
+                                    @auth
+                                        <button type="button" @click="checkoutMode = true" class="px-4 py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-md transition flex items-center gap-1.5">
+                                            <i data-lucide="shopping-cart" class="w-3.5 h-3.5 text-amber-300"></i>
+                                            <span>Beli Buku Ini</span>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('login') }}" class="px-4 py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-md transition flex items-center gap-1.5">
+                                            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                                            <span>Masuk untuk Membeli</span>
+                                        </a>
+                                    @endauth
+                                </div>
                             </div>
-                            <div class="flex gap-2">
-                                <button type="button" @click="alert('Fitur baca buku digital segera hadir!');" class="px-4 py-2 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl shadow-sm transition">
-                                    Baca Sekarang
-                                </button>
+
+                            <!-- State 2: Checkout Mode -->
+                            <div x-show="checkoutMode" x-cloak class="bg-[#F5ECE0] p-4 rounded-2xl border border-[#E4D6C4] space-y-3">
+                                <div class="flex items-center justify-between pb-2 border-b border-[#E4D6C4]">
+                                    <span class="text-xs font-bold text-[#4A3222] flex items-center gap-1.5">
+                                        <i data-lucide="credit-card" class="w-4 h-4 text-[#7A5034]"></i>
+                                        <span>Konfirmasi Pembelian Buku</span>
+                                    </span>
+                                    <button type="button" @click="checkoutMode = false" class="text-xs text-[#8C7A6D] hover:text-[#4A3222] font-semibold">
+                                        Batal
+                                    </button>
+                                </div>
+
+                                <form action="{{ route('orders.store') }}" method="POST" class="space-y-3">
+                                    @csrf
+                                    <input type="hidden" name="book_id" :value="selectedBook.id">
+
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-[#8C7A6D] mb-1">Jumlah</label>
+                                            <input type="number" name="quantity" min="1" max="5" x-model="buyQuantity" class="w-full px-3 py-1.5 bg-white border border-[#DACAB6] rounded-xl text-xs font-semibold text-[#4A3222] focus:outline-none">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-[#8C7A6D] mb-1">Metode Bayar</label>
+                                            <select name="payment_method" class="w-full px-2 py-1.5 bg-white border border-[#DACAB6] rounded-xl text-xs font-medium text-[#4A3222] focus:outline-none">
+                                                <option value="QRIS (Instant)">QRIS (Instant)</option>
+                                                <option value="Transfer Bank BCA/Mandiri">Transfer Bank</option>
+                                                <option value="E-Wallet GoPay/OVO">E-Wallet</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-2 border-t border-[#E4D6C4]">
+                                        <div>
+                                            <span class="text-[10px] text-[#8C7A6D] block">Total Bayar:</span>
+                                            <span class="text-base font-bold text-[#7A5034]" x-text="'Rp ' + (selectedBook.price * buyQuantity).toLocaleString('id-ID')"></span>
+                                        </div>
+                                        <button type="submit" class="px-5 py-2.5 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
+                                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                            <span>Bayar Sekarang</span>
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

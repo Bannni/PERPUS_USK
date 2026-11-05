@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AdminBookController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Page
@@ -14,7 +16,7 @@ Route::get('/library', [BookController::class, 'catalog'])->name('library'); // 
 // API for quick book modal details
 Route::get('/api/books/{id}', [BookController::class, 'show'])->name('books.show');
 
-// Authentication Routes
+// Authentication Routes (Guest Only)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -23,4 +25,20 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+// Authenticated Routes (User & Admin)
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Fitur Beli Buku & Riwayat Pembelian
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/my-orders', [OrderController::class, 'index'])->name('orders.index');
+});
+
+// Admin Protected Routes (Cannot be accessed by regular user)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminBookController::class, 'index'])->name('dashboard');
+    Route::post('/books', [AdminBookController::class, 'store'])->name('books.store');
+    Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('books.update');
+    Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('books.destroy');
+    Route::get('/orders', [AdminBookController::class, 'orders'])->name('orders');
+});

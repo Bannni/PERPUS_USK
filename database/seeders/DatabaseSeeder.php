@@ -13,12 +13,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Demo User
-        User::firstOrCreate(
+        // 1. Admin Account
+        User::updateOrCreate(
+            ['email' => 'admin@readowl.com'],
+            [
+                'name' => 'Administrator Readowl',
+                'phone' => '081234567890',
+                'password' => Hash::make('Password@123'),
+                'role' => 'admin',
+            ]
+        );
+
+        // 2. Demo Reader User
+        User::updateOrCreate(
             ['email' => 'pembaca@readowl.com'],
             [
                 'name' => 'Assya Pembaca',
-                'password' => Hash::make('password123'),
+                'phone' => '089876543210',
+                'password' => Hash::make('Password@123'),
+                'role' => 'user',
             ]
         );
 

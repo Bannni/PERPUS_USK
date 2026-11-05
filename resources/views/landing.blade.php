@@ -28,6 +28,12 @@
                     <a href="{{ route('catalog') }}" class="hover:text-[#1C1815] transition hidden md:inline">Catalog</a>
                     <a href="#featured" class="hover:text-[#1C1815] transition hidden md:inline">Featured</a>
                     @auth
+                        @if(Auth::user()->isAdmin())
+                            <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-1.5 bg-amber-600 text-white rounded-full text-xs font-semibold hover:bg-amber-700 transition flex items-center gap-1.5 shadow-sm">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                                <span>Studio Admin</span>
+                            </a>
+                        @endif
                         <a href="{{ route('catalog') }}" class="px-4 py-1.5 bg-[#1C1815] text-[#F0EDE6] rounded-full text-xs font-semibold hover:bg-[#3D332B] transition">
                             My Library
                         </a>

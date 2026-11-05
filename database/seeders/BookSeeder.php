@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Book;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class BookSeeder extends Seeder
 {
@@ -12,7 +13,9 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
+        Schema::disableForeignKeyConstraints();
         Book::truncate();
+        Schema::enableForeignKeyConstraints();
 
         $books = [
             // Currently Reading (3 books matching top shelf)

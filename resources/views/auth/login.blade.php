@@ -145,6 +145,21 @@
                                class="w-full px-4 py-2.5 bg-[#FAF9F5] border border-[#E5E0D6] rounded-2xl text-xs sm:text-sm text-[#1C1815] placeholder-[#B5ABA0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1C1815] focus:border-transparent transition">
                     </div>
 
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="reg-phone" class="block text-xs font-semibold text-[#5C534B]">Nomor HP / WhatsApp</label>
+                            <span class="text-[10px] text-[#A39688]">Maks 15 digit</span>
+                        </div>
+                        <input id="reg-phone" 
+                               name="phone" 
+                               type="tel" 
+                               required 
+                               maxlength="15"
+                               value="{{ old('phone') }}"
+                               placeholder="081234567890" 
+                               class="w-full px-4 py-2.5 bg-[#FAF9F5] border border-[#E5E0D6] rounded-2xl text-xs sm:text-sm text-[#1C1815] placeholder-[#B5ABA0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1C1815] focus:border-transparent transition">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label for="reg-password" class="block text-xs font-semibold text-[#5C534B] mb-1">Kata Sandi</label>
@@ -152,7 +167,7 @@
                                    name="password" 
                                    type="password" 
                                    required 
-                                   placeholder="Min 6 char" 
+                                   placeholder="Min 8 karakter" 
                                    class="w-full px-3 py-2.5 bg-[#FAF9F5] border border-[#E5E0D6] rounded-2xl text-xs sm:text-sm text-[#1C1815] placeholder-[#B5ABA0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1C1815] focus:border-transparent transition">
                         </div>
 
@@ -162,8 +177,19 @@
                                    name="password_confirmation" 
                                    type="password" 
                                    required 
-                                   placeholder="Ulangi" 
+                                   placeholder="Ulangi sandi" 
                                    class="w-full px-3 py-2.5 bg-[#FAF9F5] border border-[#E5E0D6] rounded-2xl text-xs sm:text-sm text-[#1C1815] placeholder-[#B5ABA0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1C1815] focus:border-transparent transition">
+                        </div>
+                    </div>
+
+                    <!-- Password combination requirements info -->
+                    <div class="bg-[#F8F5EE] border border-[#E9E2D5] rounded-xl p-2.5 text-[11px] text-[#7A6E63] space-y-1">
+                        <span class="font-semibold text-[#1C1815] block">Kombinasi sandi wajib:</span>
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px]">
+                            <span>✓ Min. 8 Karakter</span>
+                            <span>✓ Huruf Besar (A-Z)</span>
+                            <span>✓ Huruf Kecil (a-z)</span>
+                            <span>✓ Angka & Simbol (@#$%)</span>
                         </div>
                     </div>
 
