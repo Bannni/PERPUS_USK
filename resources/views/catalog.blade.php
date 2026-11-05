@@ -3,7 +3,7 @@
 @section('title', 'My Library - Readowl Bookstore')
 
 @section('content')
-<div class="min-h-screen bg-[#F4ECE1]/60 flex flex-col md:flex-row p-3 md:p-6 lg:p-8 gap-5" x-data="{
+<div class="min-h-screen md:h-screen md:overflow-hidden bg-[#F4ECE1]/60 flex flex-col md:flex-row p-3 md:p-6 lg:p-8 gap-5" x-data="{
     activeTab: '{{ $activeTab ?? 'shelves' }}',
     selectedBook: null,
     modalOpen: false,
@@ -12,8 +12,8 @@
         this.modalOpen = true;
     }
 }">
-    <!-- SIDEBAR -->
-    <aside class="w-full md:w-64 lg:w-72 flex flex-col justify-between shrink-0 bg-[#FAF7F2] md:bg-transparent rounded-2xl p-4 md:p-0">
+    <!-- SIDEBAR (FIXED ON DESKTOP) -->
+    <aside class="w-full md:w-64 lg:w-72 flex flex-col justify-between shrink-0 md:h-full md:overflow-y-auto bg-[#FAF7F2] md:bg-transparent rounded-2xl p-4 md:p-0 select-none">
         <div>
             <!-- Readowl Logo -->
             <div class="flex items-center gap-3 px-2 py-4 mb-4">
@@ -117,8 +117,8 @@
         </div>
     </aside>
 
-    <!-- MAIN BOOKCASE CONTAINER (Matching Reference Canvas) -->
-    <main class="flex-1 bg-[#FAF7F2] border border-[#EADECF] rounded-[32px] p-5 sm:p-7 md:p-8 lg:p-10 shadow-sm flex flex-col justify-between">
+    <!-- MAIN BOOKCASE CONTAINER (SCROLLABLE CANVAS) -->
+    <main class="flex-1 md:h-full md:overflow-y-auto bg-[#FAF7F2] border border-[#EADECF] rounded-[32px] p-5 sm:p-7 md:p-8 lg:p-10 shadow-sm flex flex-col justify-between scroll-smooth">
         <div>
             <!-- Top Controls: Tabs and Search Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
