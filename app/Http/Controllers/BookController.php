@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -20,13 +22,61 @@ class BookController extends Controller
     }
 
     /**
-     * Display the bookstore catalog / shelves page.
-     * Matches the Readowl bookshelf layout.
+     * Display the user's personal library (Shelves).
+     * Only displays books that have been purchased by the logged-in user.
+     * Shelves are separated by Book Genre / Category.
      */
-    public function catalog(Request $request)
+    public function myLibrary(Request $request)
     {
         $search = $request->input('q');
         $activeTab = $request->input('tab', 'shelves'); // 'shelves' or 'all'
+
+        if (!Auth::check()) {
+            $genresWithBooks = collect();
+            $myBooks = collect();
+            $continueReadingBook = null;
+        } else {
+            $purchasedBookIds = Order::where('user_id', Auth::id())
+                ->where('status', 'completed')
+                ->pluck('book_id')
+                ->unique();
+
+            $query = Book::whereIn('id', $purchasedBookIds);
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('author', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+                });
+            }
+
+            $myBooks = $query->get();
+
+            // Group by genre / category (as requested!)
+            $genresWithBooks = $myBooks->groupBy('category');
+
+            // Latest book for continue reading widget
+            $continueReadingBook = $myBooks->first();
+        }
+
+        return view('catalog', compact(
+            'genresWithBooks',
+            'myBooks',
+            'continueReadingBook',
+            'search',
+            'activeTab'
+        ));
+    }
+
+    /**
+     * Display the bookstore Shop / Storefront.
+     * All books available to purchase with genre filters and checkout.
+     */
+    public function shop(Request $request)
+    {
+        $search = $request->input('q');
+        $selectedCategory = $request->input('category');
 
         $query = Book::query();
 
@@ -34,33 +84,23 @@ class BookController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+                  ->orWhere('synopsis', 'like', "%{$search}%");
             });
         }
 
-        $allBooks = (clone $query)->orderBy('title')->get();
+        if ($selectedCategory) {
+            $query->where('category', $selectedCategory);
+        }
 
-        $currentlyReading = (clone $query)->where('shelf_section', 'currently_reading')->get();
-        $nextUp = (clone $query)->where('shelf_section', 'next_up')->get();
-        $finished = (clone $query)->where('shelf_section', 'finished')->get();
-
-        // Continue reading book for bottom-left widget
-        $continueReadingBook = Book::where('shelf_section', 'currently_reading')
-            ->where('reading_progress', '>', 0)
-            ->first() ?? Book::first();
-
+        $books = $query->latest()->paginate(12)->withQueryString();
         $categories = Book::select('category')->distinct()->pluck('category');
 
-        return view('catalog', compact(
-            'allBooks',
-            'currentlyReading',
-            'nextUp',
-            'finished',
-            'continueReadingBook',
-            'search',
-            'activeTab',
-            'categories'
-        ));
+        // Check which books the logged-in user already purchased
+        $userPurchasedIds = Auth::check()
+            ? Order::where('user_id', Auth::id())->where('status', 'completed')->pluck('book_id')->toArray()
+            : [];
+
+        return view('shop', compact('books', 'categories', 'selectedCategory', 'search', 'userPurchasedIds'));
     }
 
     /**

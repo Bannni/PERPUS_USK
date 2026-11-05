@@ -25,7 +25,8 @@
 
                 <!-- Right Nav Links -->
                 <div class="flex items-center gap-5 sm:gap-7">
-                    <a href="{{ route('catalog') }}" class="hover:text-[#1C1815] transition hidden md:inline">Catalog</a>
+                    <a href="{{ route('shop') }}" class="hover:text-[#1C1815] transition font-semibold text-[#7A5034]">Shop (Toko Buku)</a>
+                    <a href="{{ route('catalog') }}" class="hover:text-[#1C1815] transition hidden md:inline">My Library (Rak 3D)</a>
                     <a href="#featured" class="hover:text-[#1C1815] transition hidden md:inline">Featured</a>
                     @auth
                         @if(Auth::user()->isAdmin())

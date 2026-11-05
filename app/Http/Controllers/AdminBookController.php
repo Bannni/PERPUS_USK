@@ -10,12 +10,12 @@ use Illuminate\Http\Request;
 class AdminBookController extends Controller
 {
     /**
-     * Display admin dashboard and book management.
+     * Display admin dashboard and book CRUD management.
      */
     public function index(Request $request)
     {
         $search = $request->input('q');
-        $shelf = $request->input('shelf');
+        $category = $request->input('category');
 
         $query = Book::query();
 
@@ -27,11 +27,12 @@ class AdminBookController extends Controller
             });
         }
 
-        if ($shelf && in_array($shelf, ['currently_reading', 'next_up', 'finished'])) {
-            $query->where('shelf_section', $shelf);
+        if ($category) {
+            $query->where('category', $category);
         }
 
         $books = $query->latest()->paginate(9)->withQueryString();
+        $categories = Book::select('category')->distinct()->pluck('category');
 
         // Statistics
         $totalBooks = Book::count();
@@ -39,19 +40,45 @@ class AdminBookController extends Controller
         $totalRevenue = Order::where('status', 'completed')->sum('total_price');
         $totalUsers = User::where('role', 'user')->count();
 
-        // Recent orders
-        $recentOrders = Order::with(['user', 'book'])->latest()->take(5)->get();
-
         return view('admin.dashboard', compact(
             'books',
+            'categories',
             'totalBooks',
             'totalOrders',
             'totalRevenue',
             'totalUsers',
-            'recentOrders',
             'search',
-            'shelf'
+            'category'
         ));
+    }
+
+    /**
+     * Display user data monitoring for admin.
+     */
+    public function users(Request $request)
+    {
+        $search = $request->input('q');
+
+        $query = User::withCount(['orders' => function ($q) {
+            $q->where('status', 'completed');
+        }])->withSum(['orders' => function ($q) {
+            $q->where('status', 'completed');
+        }], 'total_price');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->latest()->paginate(10)->withQueryString();
+        $totalUsers = User::count();
+        $totalMembers = User::where('role', 'user')->count();
+        $totalAdmins = User::where('role', 'admin')->count();
+
+        return view('admin.users', compact('users', 'totalUsers', 'totalMembers', 'totalAdmins', 'search'));
     }
 
     /**
@@ -63,30 +90,29 @@ class AdminBookController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'author' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
-            'shelf_section' => ['required', 'in:currently_reading,next_up,finished'],
+            'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
             'price' => ['required', 'integer', 'min:0'],
             'cover_url' => ['required', 'url', 'max:500'],
             'rating' => ['nullable', 'numeric', 'min:1', 'max:5'],
             'pages' => ['nullable', 'integer', 'min:1'],
-            'reading_progress' => ['nullable', 'integer', 'min:0', 'max:100'],
             'published_year' => ['nullable', 'integer', 'min:1800', 'max:' . (date('Y') + 1)],
             'synopsis' => ['nullable', 'string'],
         ], [
             'title.required' => 'Judul buku wajib diisi.',
             'author.required' => 'Nama penulis wajib diisi.',
-            'category.required' => 'Kategori wajib diisi.',
+            'category.required' => 'Kategori / Genre wajib diisi.',
             'price.required' => 'Harga buku wajib diisi.',
             'cover_url.required' => 'URL sampul buku wajib diisi.',
             'cover_url.url' => 'Format URL sampul tidak valid.',
         ]);
 
+        $validated['shelf_section'] = $validated['shelf_section'] ?? 'next_up';
         $validated['rating'] = $validated['rating'] ?? 4.5;
         $validated['pages'] = $validated['pages'] ?? 250;
-        $validated['reading_progress'] = $validated['reading_progress'] ?? 0;
 
         Book::create($validated);
 
-        return redirect()->route('admin.dashboard')->with('success', "Buku '{$validated['title']}' berhasil ditambahkan ke kurasi perpustakaan!");
+        return redirect()->route('admin.dashboard')->with('success', "Buku '{$validated['title']}' berhasil ditambahkan ke database toko!");
     }
 
     /**
@@ -100,12 +126,11 @@ class AdminBookController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'author' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
-            'shelf_section' => ['required', 'in:currently_reading,next_up,finished'],
+            'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
             'price' => ['required', 'integer', 'min:0'],
             'cover_url' => ['required', 'url', 'max:500'],
             'rating' => ['nullable', 'numeric', 'min:1', 'max:5'],
             'pages' => ['nullable', 'integer', 'min:1'],
-            'reading_progress' => ['nullable', 'integer', 'min:0', 'max:100'],
             'published_year' => ['nullable', 'integer'],
             'synopsis' => ['nullable', 'string'],
         ]);

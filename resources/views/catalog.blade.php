@@ -1,18 +1,14 @@
 @extends('layouts.base')
 
-@section('title', 'My Library - Readowl Bookstore')
+@section('title', 'My Library - Rak Buku Koleksi Saya')
 
 @section('content')
 <div class="min-h-screen md:h-screen md:overflow-hidden bg-[#F4ECE1]/60 flex flex-col md:flex-row p-3 md:p-6 lg:p-8 gap-5" x-data="{
     activeTab: '{{ $activeTab ?? 'shelves' }}',
     selectedBook: null,
     modalOpen: false,
-    checkoutMode: false,
-    buyQuantity: 1,
     openBook(book) {
         this.selectedBook = book;
-        this.checkoutMode = false;
-        this.buyQuantity = 1;
         this.modalOpen = true;
     }
 }">
@@ -22,7 +18,6 @@
             <!-- Readowl Logo -->
             <div class="flex items-center gap-3 px-2 py-4 mb-4">
                 <div class="w-10 h-10 rounded-full bg-[#E8DCB9]/60 flex items-center justify-center text-[#7A5034]">
-                    <!-- Owl icon SVG -->
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2C8 2 4 5 4 10c0 4 2 8 8 12 6-4 8-8 8-12 0-5-4-8-8-8z"/>
                         <circle cx="9" cy="9" r="2.5" fill="#7A5034"/>
@@ -49,14 +44,10 @@
                     <span>My library</span>
                 </a>
 
-                <a href="{{ route('catalog', ['tab' => 'all']) }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
+                <!-- Shop (Where all books are purchased!) -->
+                <a href="{{ route('shop') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
                     <i data-lucide="shopping-bag" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
-                    <span class="font-medium text-sm">Shop</span>
-                </a>
-
-                <a href="{{ route('home') }}#features" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
-                    <i data-lucide="newspaper" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
-                    <span class="font-medium text-sm">News</span>
+                    <span class="font-medium text-sm">Shop (Toko Buku)</span>
                 </a>
 
                 @auth
@@ -66,10 +57,10 @@
                     </a>
 
                     @if(Auth::user()->isAdmin())
-                        <div class="pt-2">
-                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-[#1C1815] text-amber-300 font-semibold text-xs shadow-md hover:bg-black transition">
+                        <div class="pt-3">
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#1C1815] text-amber-300 font-semibold text-xs shadow-md hover:bg-black transition border border-amber-400/20">
                                 <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
-                                <span>Studio Admin (CRUD)</span>
+                                <span>Panel Admin Kurator</span>
                             </a>
                         </div>
                     @endif
@@ -79,12 +70,12 @@
 
         <!-- Bottom Widgets -->
         <div class="mt-8 space-y-4">
-            <!-- Continue Reading Card (Matching Screenshot bottom left) -->
+            <!-- Continue Reading Card (Only if user has bought books) -->
             @if($continueReadingBook)
             <div class="bg-[#F2E8DC] border border-[#E3D6C5] rounded-2xl p-3.5 shadow-sm">
                 <div class="text-[11px] font-semibold uppercase tracking-wider text-[#8A7463] mb-2.5 flex items-center justify-between">
-                    <span>Continue reading</span>
-                    <span class="text-[#7A5034]">{{ $continueReadingBook->reading_progress }}%</span>
+                    <span>Terakhir Dibeli</span>
+                    <span class="text-[#7A5034] font-bold">Koleksi Anda</span>
                 </div>
                 <div class="flex items-center gap-3 cursor-pointer group" @click="openBook({{ json_encode($continueReadingBook) }})">
                     <div class="w-12 h-16 shrink-0 rounded overflow-hidden shadow-sm border border-[#DACBB8]">
@@ -93,11 +84,9 @@
                     <div class="overflow-hidden flex-1">
                         <h4 class="text-xs font-bold text-[#4A3222] truncate group-hover:text-[#7A5034] transition">{{ $continueReadingBook->title }}</h4>
                         <p class="text-[11px] text-[#8C7A6D] truncate mt-0.5">{{ $continueReadingBook->author }}</p>
-                        
-                        <!-- Mini Progress Bar -->
-                        <div class="w-full bg-[#DFD0BD] h-1.5 rounded-full mt-2 overflow-hidden">
-                            <div class="bg-[#B0825B] h-full rounded-full" style="width: {{ $continueReadingBook->reading_progress }}%"></div>
-                        </div>
+                        <span class="inline-block mt-1.5 text-[9px] uppercase px-1.5 py-0.5 rounded bg-[#E4D5C2] text-[#5F3D27] font-semibold">
+                            {{ $continueReadingBook->category }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -113,7 +102,7 @@
                             </div>
                             <div class="overflow-hidden">
                                 <p class="text-xs font-bold text-[#4A3222] truncate">{{ Auth::user()->name }}</p>
-                                <p class="text-[10px] text-[#8C7A6D] truncate">{{ Auth::user()->email }}</p>
+                                <p class="text-[10px] text-[#8C7A6D] truncate">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'Pembaca' }}</p>
                             </div>
                         </div>
                         <form action="{{ route('logout') }}" method="POST">
@@ -154,171 +143,104 @@
 
             <!-- Top Controls: Tabs and Search Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <!-- Tabs: Shelves vs All Books -->
-                <div class="inline-flex items-center gap-1.5 p-1 bg-[#F1E8DC] rounded-xl border border-[#E4D7C5]">
-                    <button type="button" 
-                            @click="activeTab = 'shelves'" 
-                            :class="activeTab === 'shelves' ? 'bg-[#FAF7F2] text-[#5F3D27] font-semibold shadow-xs' : 'text-[#8C7B6E] hover:text-[#5F3D27]'"
-                            class="px-4 py-1.5 rounded-lg text-xs md:text-sm transition">
-                        Shelves
-                    </button>
-                    <button type="button" 
-                            @click="activeTab = 'all'" 
-                            :class="activeTab === 'all' ? 'bg-[#FAF7F2] text-[#5F3D27] font-semibold shadow-xs' : 'text-[#8C7B6E] hover:text-[#5F3D27]'"
-                            class="px-4 py-1.5 rounded-lg text-xs md:text-sm transition">
-                        All Books
-                    </button>
+                <!-- Info Label & Quick Shop Link -->
+                <div class="flex items-center gap-2">
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#5F3D27]">My Library (Rak Buku Pribadi)</h2>
+                    @auth
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#EFE5D7] text-[#7A5034] font-semibold">
+                            {{ $myBooks->count() }} Buku Dimiliki
+                        </span>
+                    @endauth
                 </div>
 
-                <!-- Search Input Bar -->
-                <form action="{{ route('catalog') }}" method="GET" class="relative max-w-md w-full">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8988B]"></i>
-                    <input type="text" 
-                           name="q" 
-                           value="{{ request('q') }}"
-                           placeholder="Search in My library..." 
-                           class="w-full pl-10 pr-4 py-2 bg-[#F1E8DC]/80 hover:bg-[#F1E8DC] focus:bg-white text-xs md:text-sm text-[#4A3222] placeholder-[#A8988B] rounded-xl border border-[#E4D7C5] focus:outline-none focus:ring-2 focus:ring-[#B0825B]/40 focus:border-[#B0825B] transition">
-                    @if(request('q'))
-                        <a href="{{ route('catalog') }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A8988B] hover:text-[#5F3D27]">Reset</a>
-                    @endif
-                </form>
+                <!-- Search & Shop Action -->
+                <div class="flex items-center gap-3">
+                    <form action="{{ route('catalog') }}" method="GET" class="relative max-w-xs w-full">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8988B]"></i>
+                        <input type="text" 
+                               name="q" 
+                               value="{{ request('q') }}"
+                               placeholder="Cari di rak saya..." 
+                               class="w-full pl-10 pr-4 py-2 bg-[#F1E8DC]/80 hover:bg-[#F1E8DC] focus:bg-white text-xs md:text-sm text-[#4A3222] placeholder-[#A8988B] rounded-xl border border-[#E4D7C5] focus:outline-none focus:ring-2 focus:ring-[#B0825B]/40 focus:border-[#B0825B] transition">
+                    </form>
+
+                    <a href="{{ route('shop') }}" class="px-4 py-2 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Beli Buku di Shop</span>
+                    </a>
+                </div>
             </div>
 
-            <!-- TAB 1: SHELVES VIEW (THE SKEUOMORPHIC 3D BOOKSHELF) -->
-            <div x-show="activeTab === 'shelves'" class="space-y-12">
+            <!-- SHELVES VIEW (GROUPED BY GENRE / KATEGORI BUKU) -->
+            <div class="space-y-12">
                 
-                <!-- SHELF 1: Currently reading -->
-                <section class="shelf-container">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-serif text-lg md:text-xl font-bold text-[#5F3D27] tracking-tight">Currently reading</h3>
-                        @if($currentlyReading->count() > 0)
-                            <span class="text-xs text-[#9C8B7E] font-medium">{{ $currentlyReading->count() }} buku</span>
-                        @endif
-                    </div>
-
-                    <!-- Books On Shelf -->
-                    <div class="relative pt-4 pb-0 px-4 md:px-8 flex items-end gap-6 sm:gap-8 md:gap-12 overflow-x-auto min-h-[190px]">
-                        @forelse($currentlyReading as $book)
-                            <div class="book-wrapper cursor-pointer shrink-0" @click="openBook({{ json_encode($book) }})">
-                                <div class="w-24 sm:w-28 md:w-32 aspect-[2/3] book-cover bg-[#E9DECD]">
-                                    <img src="{{ $book->cover_url }}" 
-                                         alt="{{ $book->title }}" 
-                                         class="w-full h-full object-cover">
+                @if($genresWithBooks->count() > 0)
+                    <!-- TAMPILAN RAK PER GENRE BUKU YANG SUDAH DIBELI -->
+                    @foreach($genresWithBooks as $genre => $books)
+                        <section class="shelf-container">
+                            <div class="flex items-center justify-between mb-4 px-1">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#B0825B]"></span>
+                                    <h3 class="font-serif text-lg md:text-xl font-bold text-[#5F3D27] tracking-tight">
+                                        Genre: {{ $genre }}
+                                    </h3>
                                 </div>
-                                <div class="text-center mt-2 w-24 sm:w-28 md:w-32">
-                                    <p class="text-[11px] font-semibold text-[#4A3222] truncate">{{ $book->title }}</p>
-                                    <p class="text-[9px] text-[#8C7A6D] truncate">{{ $book->author }}</p>
-                                </div>
+                                <span class="text-xs text-[#9C8B7E] font-medium">{{ $books->count() }} buku dikoleksi</span>
                             </div>
-                        @empty
-                            <div class="py-8 text-center w-full text-xs text-[#9C8B7E] italic">
-                                Belum ada buku yang sedang dibaca.
+
+                            <!-- Books On Genre Shelf -->
+                            <div class="relative pt-4 pb-0 px-4 md:px-8 flex items-end gap-6 sm:gap-8 md:gap-12 overflow-x-auto min-h-[190px]">
+                                @foreach($books as $book)
+                                    <div class="book-wrapper cursor-pointer shrink-0" @click="openBook({{ json_encode($book) }})">
+                                        <div class="w-24 sm:w-28 md:w-32 aspect-[2/3] book-cover bg-[#E9DECD]">
+                                            <img src="{{ $book->cover_url }}" 
+                                                 alt="{{ $book->title }}" 
+                                                 class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="text-center mt-2 w-24 sm:w-28 md:w-32">
+                                            <p class="text-[11px] font-semibold text-[#4A3222] truncate">{{ $book->title }}</p>
+                                            <p class="text-[9px] text-[#8C7A6D] truncate">{{ $book->author }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforelse
-                    </div>
 
-                    <!-- 3D Shelf Ledge -->
-                    <div class="shelf-surface mt-1"></div>
-                    <div class="shelf-face"></div>
-                </section>
-
-                <!-- SHELF 2: Next up -->
-                <section class="shelf-container">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-serif text-lg md:text-xl font-bold text-[#5F3D27] tracking-tight">Next up</h3>
-                        <a href="{{ route('catalog', ['tab' => 'all']) }}" class="text-xs font-semibold text-[#7A5034] hover:text-[#5F3D27] flex items-center gap-1 group">
-                            <span>Full shelf</span>
-                            <span class="group-hover:translate-x-0.5 transition">→</span>
-                        </a>
-                    </div>
-
-                    <!-- Books On Shelf -->
-                    <div class="relative pt-4 pb-0 px-4 md:px-8 flex items-end gap-5 sm:gap-7 md:gap-10 overflow-x-auto min-h-[190px]">
-                        @forelse($nextUp as $book)
-                            <div class="book-wrapper cursor-pointer shrink-0" @click="openBook({{ json_encode($book) }})">
-                                <div class="w-20 sm:w-24 md:w-28 aspect-[2/3] book-cover bg-[#E9DECD]">
-                                    <img src="{{ $book->cover_url }}" 
-                                         alt="{{ $book->title }}" 
-                                         class="w-full h-full object-cover">
-                                </div>
-                                <div class="text-center mt-2 w-20 sm:w-24 md:w-28">
-                                    <p class="text-[11px] font-semibold text-[#4A3222] truncate">{{ $book->title }}</p>
-                                    <p class="text-[9px] text-[#8C7A6D] truncate">{{ $book->author }}</p>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="py-8 text-center w-full text-xs text-[#9C8B7E] italic">
-                                Belum ada buku di antrean bacaan.
-                            </div>
-                        @endforelse
-                    </div>
-
-                    <!-- 3D Shelf Ledge -->
-                    <div class="shelf-surface mt-1"></div>
-                    <div class="shelf-face"></div>
-                </section>
-
-                <!-- SHELF 3: Finished -->
-                <section class="shelf-container">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-serif text-lg md:text-xl font-bold text-[#5F3D27] tracking-tight">Finished</h3>
-                        <a href="{{ route('catalog', ['tab' => 'all']) }}" class="text-xs font-semibold text-[#7A5034] hover:text-[#5F3D27] flex items-center gap-1 group">
-                            <span>Full shelf</span>
-                            <span class="group-hover:translate-x-0.5 transition">→</span>
-                        </a>
-                    </div>
-
-                    <!-- Books On Shelf -->
-                    <div class="relative pt-4 pb-0 px-4 md:px-8 flex items-end gap-5 sm:gap-7 md:gap-10 overflow-x-auto min-h-[190px]">
-                        @forelse($finished as $book)
-                            <div class="book-wrapper cursor-pointer shrink-0" @click="openBook({{ json_encode($book) }})">
-                                <div class="w-20 sm:w-24 md:w-28 aspect-[2/3] book-cover bg-[#E9DECD]">
-                                    <img src="{{ $book->cover_url }}" 
-                                         alt="{{ $book->title }}" 
-                                         class="w-full h-full object-cover">
-                                </div>
-                                <div class="text-center mt-2 w-20 sm:w-24 md:w-28">
-                                    <p class="text-[11px] font-semibold text-[#4A3222] truncate">{{ $book->title }}</p>
-                                    <p class="text-[9px] text-[#8C7A6D] truncate">{{ $book->author }}</p>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="py-8 text-center w-full text-xs text-[#9C8B7E] italic">
-                                Belum ada buku yang selesai dibaca.
-                            </div>
-                        @endforelse
-                    </div>
-
-                    <!-- 3D Shelf Ledge -->
-                    <div class="shelf-surface mt-1"></div>
-                    <div class="shelf-face"></div>
-                </section>
-
-            </div>
-
-            <!-- TAB 2: ALL BOOKS GRID VIEW -->
-            <div x-show="activeTab === 'all'" x-cloak class="mt-4">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-serif text-xl font-bold text-[#5F3D27]">Semua Koleksi Buku ({{ $allBooks->count() }})</h3>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    @foreach($allBooks as $book)
-                        <div class="group cursor-pointer flex flex-col" @click="openBook({{ json_encode($book) }})">
-                            <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-md group-hover:shadow-xl group-hover:-translate-y-1.5 transition-all duration-300 relative border border-[#E2D5C4]">
-                                <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
-                                <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-xs text-[#7A5034] text-[10px] font-bold px-1.5 py-0.5 rounded shadow-xs">
-                                    ★ {{ $book->rating }}
-                                </div>
-                            </div>
-                            <div class="mt-2.5">
-                                <h4 class="font-bold text-xs text-[#4A3222] group-hover:text-[#7A5034] transition line-clamp-1">{{ $book->title }}</h4>
-                                <p class="text-[11px] text-[#8C7A6D] line-clamp-1">{{ $book->author }}</p>
-                                <p class="text-xs font-semibold text-[#7A5034] mt-1">Rp {{ number_format($book->price, 0, ',', '.') }}</p>
-                            </div>
-                        </div>
+                            <!-- 3D Shelf Ledge -->
+                            <div class="shelf-surface mt-1"></div>
+                            <div class="shelf-face"></div>
+                        </section>
                     @endforeach
-                </div>
+                @else
+                    <!-- EMPTY STATE: RAK AWAL KOSONG SEBELUM MEMBELI BUKU -->
+                    <div class="py-10 text-center max-w-xl mx-auto space-y-6">
+                        
+                        <!-- Empty Shelf Graphic -->
+                        <div class="shelf-container px-4">
+                            <div class="h-28 flex items-center justify-center text-[#A8988B] italic text-xs sm:text-sm">
+                                <span>~ Rak buku pribadi Anda masih kosong ~</span>
+                            </div>
+                            <div class="shelf-surface"></div>
+                            <div class="shelf-face"></div>
+                        </div>
+
+                        <div class="bg-[#FAF7F2] border border-[#E7DCCE] rounded-3xl p-8 shadow-xs">
+                            <div class="w-14 h-14 rounded-full bg-[#EFE5D7] text-[#7A5034] mx-auto flex items-center justify-center mb-4">
+                                <i data-lucide="book-marked" class="w-7 h-7"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-[#4A3222]">Mulai Koleksi Buku Impianmu</h3>
+                            <p class="text-xs sm:text-sm text-[#7A6B60] mt-2 mb-6 leading-relaxed">
+                                Buku yang Anda beli di <strong>Shop (Toko Buku)</strong> akan otomatis tertata di sini dan dikelompokkan rapi ke rak berdasarkan masing-masing genrenya.
+                            </p>
+                            
+                            <a href="{{ route('shop') }}" class="px-6 py-3.5 bg-[#7A5034] hover:bg-[#5F3D27] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md transition inline-flex items-center gap-2 group">
+                                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                <span>Kunjungi Shop untuk Beli Buku</span>
+                                <span class="group-hover:translate-x-1 transition">→</span>
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
             </div>
 
         </div>
@@ -327,14 +249,14 @@
         <div class="pt-8 mt-12 border-t border-[#EFE5D7] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9C8B7E] gap-2">
             <p>© 2026 Readowl Bookstore • Terintegrasi dengan MySQL XAMPP (<span class="font-mono text-[#7A5034]">perpus_db</span>)</p>
             <div class="flex items-center gap-4">
-                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] underline">Halaman Utama</a>
+                <a href="{{ route('shop') }}" class="hover:text-[#5F3D27] font-semibold text-[#7A5034]">Toko Buku (Shop)</a>
                 <span>•</span>
-                <span>Mode Rak Klasik</span>
+                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] underline">Halaman Utama</a>
             </div>
         </div>
     </main>
 
-    <!-- BOOK DETAIL MODAL -->
+    <!-- BOOK DETAIL MODAL (UNTUK BUKU DI RAK KOLEKSI SENDIRI) -->
     <div x-show="modalOpen" 
          x-cloak
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
@@ -343,27 +265,23 @@
         <div class="bg-[#FAF7F2] border border-[#E7DBCB] rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden"
              @click.away="modalOpen = false">
             
-            <!-- Close Button -->
             <button @click="modalOpen = false" class="absolute top-4 right-4 p-2 text-[#9C8B7E] hover:text-[#4A3222] hover:bg-[#EFE5D7] rounded-full transition">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
 
             <template x-if="selectedBook">
                 <div class="flex flex-col sm:flex-row gap-6">
-                    <!-- Book Cover -->
                     <div class="w-36 sm:w-44 aspect-[2/3] shrink-0 mx-auto sm:mx-0 rounded-xl overflow-hidden shadow-lg border border-[#DACBB8]">
                         <img :src="selectedBook.cover_url" :alt="selectedBook.title" class="w-full h-full object-cover">
                     </div>
 
-                    <!-- Details -->
                     <div class="flex-1 flex flex-col justify-between">
                         <div>
-                            <span class="inline-block text-[11px] font-bold uppercase tracking-wider text-[#9C6D47] bg-[#EFE4D6] px-2.5 py-0.5 rounded-full" x-text="selectedBook.category"></span>
+                            <span class="inline-block text-[11px] font-bold uppercase tracking-wider text-[#9C6D47] bg-[#EFE4D6] px-2.5 py-0.5 rounded-full" x-text="'Genre: ' + selectedBook.category"></span>
                             
                             <h3 class="font-serif text-2xl font-bold text-[#4A3222] mt-2 leading-tight" x-text="selectedBook.title"></h3>
                             <p class="text-sm text-[#7A6B60] mt-0.5 font-medium" x-text="'Penulis: ' + selectedBook.author"></p>
 
-                            <!-- Rating & Pages -->
                             <div class="flex items-center gap-4 mt-3 text-xs text-[#8C7A6D]">
                                 <div class="flex items-center text-amber-600 font-bold gap-1">
                                     <span>★</span>
@@ -375,97 +293,21 @@
                                 <span x-text="'Tahun: ' + (selectedBook.published_year || '-')"></span>
                             </div>
 
-                            <!-- Progress (if available) -->
-                            <template x-if="selectedBook.reading_progress > 0">
-                                <div class="mt-4 bg-[#F2E8DC] p-2.5 rounded-xl border border-[#E3D6C5]">
-                                    <div class="flex justify-between text-xs font-semibold text-[#6E4F39] mb-1">
-                                        <span>Progres Membaca</span>
-                                        <span x-text="selectedBook.reading_progress + '%'"></span>
-                                    </div>
-                                    <div class="w-full bg-[#DFD0BD] h-2 rounded-full overflow-hidden">
-                                        <div class="bg-[#A07047] h-full rounded-full" :style="'width: ' + selectedBook.reading_progress + '%'"></div>
-                                    </div>
-                                </div>
-                            </template>
-
-                            <!-- Synopsis -->
                             <div class="mt-4">
                                 <h4 class="text-xs font-bold uppercase text-[#8C7A6D] tracking-wider mb-1">Sinopsis</h4>
                                 <p class="text-xs text-[#5D4F46] leading-relaxed line-clamp-4" x-text="selectedBook.synopsis || 'Tidak ada sinopsis tersedia.'"></p>
                             </div>
                         </div>
 
-                        <!-- Price & Action / Checkout Section -->
-                        <div class="mt-6 pt-4 border-t border-[#E8DDCE]">
-                            <!-- State 1: Normal View -->
-                            <div x-show="!checkoutMode" class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] text-[#8C7A6D] block">Harga Buku</span>
-                                    <span class="text-lg font-bold text-[#7A5034]" x-text="'Rp ' + (selectedBook.price ? selectedBook.price.toLocaleString('id-ID') : '75.000')"></span>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button type="button" @click="alert('Mode membaca buku dibuka.');" class="px-3.5 py-2 bg-[#EFE5D7] hover:bg-[#E5D7C5] text-[#5F3D27] text-xs font-semibold rounded-xl transition">
-                                        Baca
-                                    </button>
-
-                                    @auth
-                                        <button type="button" @click="checkoutMode = true" class="px-4 py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-md transition flex items-center gap-1.5">
-                                            <i data-lucide="shopping-cart" class="w-3.5 h-3.5 text-amber-300"></i>
-                                            <span>Beli Buku Ini</span>
-                                        </button>
-                                    @else
-                                        <a href="{{ route('login') }}" class="px-4 py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-md transition flex items-center gap-1.5">
-                                            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-                                            <span>Masuk untuk Membeli</span>
-                                        </a>
-                                    @endauth
-                                </div>
-                            </div>
-
-                            <!-- State 2: Checkout Mode -->
-                            <div x-show="checkoutMode" x-cloak class="bg-[#F5ECE0] p-4 rounded-2xl border border-[#E4D6C4] space-y-3">
-                                <div class="flex items-center justify-between pb-2 border-b border-[#E4D6C4]">
-                                    <span class="text-xs font-bold text-[#4A3222] flex items-center gap-1.5">
-                                        <i data-lucide="credit-card" class="w-4 h-4 text-[#7A5034]"></i>
-                                        <span>Konfirmasi Pembelian Buku</span>
-                                    </span>
-                                    <button type="button" @click="checkoutMode = false" class="text-xs text-[#8C7A6D] hover:text-[#4A3222] font-semibold">
-                                        Batal
-                                    </button>
-                                </div>
-
-                                <form action="{{ route('orders.store') }}" method="POST" class="space-y-3">
-                                    @csrf
-                                    <input type="hidden" name="book_id" :value="selectedBook.id">
-
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-[10px] font-bold uppercase text-[#8C7A6D] mb-1">Jumlah</label>
-                                            <input type="number" name="quantity" min="1" max="5" x-model="buyQuantity" class="w-full px-3 py-1.5 bg-white border border-[#DACAB6] rounded-xl text-xs font-semibold text-[#4A3222] focus:outline-none">
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-[10px] font-bold uppercase text-[#8C7A6D] mb-1">Metode Bayar</label>
-                                            <select name="payment_method" class="w-full px-2 py-1.5 bg-white border border-[#DACAB6] rounded-xl text-xs font-medium text-[#4A3222] focus:outline-none">
-                                                <option value="QRIS (Instant)">QRIS (Instant)</option>
-                                                <option value="Transfer Bank BCA/Mandiri">Transfer Bank</option>
-                                                <option value="E-Wallet GoPay/OVO">E-Wallet</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-2 border-t border-[#E4D6C4]">
-                                        <div>
-                                            <span class="text-[10px] text-[#8C7A6D] block">Total Bayar:</span>
-                                            <span class="text-base font-bold text-[#7A5034]" x-text="'Rp ' + (selectedBook.price * buyQuantity).toLocaleString('id-ID')"></span>
-                                        </div>
-                                        <button type="submit" class="px-5 py-2.5 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
-                                            <i data-lucide="check-circle" class="w-4 h-4"></i>
-                                            <span>Bayar Sekarang</span>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div class="mt-6 pt-4 border-t border-[#E8DDCE] flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full flex items-center gap-1">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                Buku Telah Dimiliki
+                            </span>
+                            <button type="button" @click="alert('Mode pembaca digital untuk buku ' + selectedBook.title + ' dibuka!');" class="px-4 py-2 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
+                                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                <span>Mulai Membaca</span>
+                            </button>
                         </div>
                     </div>
                 </div>

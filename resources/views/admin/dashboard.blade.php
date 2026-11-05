@@ -37,6 +37,11 @@
 
             <!-- Actions Right -->
             <div class="flex items-center gap-3 sm:gap-4">
+                <a href="{{ route('admin.users') }}" class="px-3.5 py-2 text-xs font-semibold text-[#D4C7B8] hover:text-white bg-[#26211C] hover:bg-[#332D26] rounded-xl border border-[#3D352D] transition flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-sky-400"></i>
+                    <span class="hidden sm:inline">Data Pengguna</span>
+                </a>
+
                 <a href="{{ route('admin.orders') }}" class="px-3.5 py-2 text-xs font-semibold text-[#D4C7B8] hover:text-white bg-[#26211C] hover:bg-[#332D26] rounded-xl border border-[#3D352D] transition flex items-center gap-2">
                     <i data-lucide="receipt" class="w-4 h-4 text-amber-400"></i>
                     <span class="hidden sm:inline">Semua Pesanan</span>
@@ -132,30 +137,24 @@
         <!-- SEARCH & FILTER BAR -->
         <div class="bg-[#1D1A16] border border-[#332C24] rounded-2xl p-4 sm:p-5 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
             
-            <!-- Shelf Filter Pills -->
+            <!-- Category / Genre Filter Pills -->
             <div class="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
                 <a href="{{ route('admin.dashboard') }}" 
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ empty($shelf) ? 'bg-amber-500 text-[#151311]' : 'text-[#A69785] hover:text-white bg-[#28231E]' }}">
-                    Semua Rak
+                   class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ empty($category) ? 'bg-amber-500 text-[#151311]' : 'text-[#A69785] hover:text-white bg-[#28231E]' }}">
+                    Semua Genre
                 </a>
-                <a href="{{ route('admin.dashboard', ['shelf' => 'currently_reading', 'q' => request('q')]) }}" 
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ $shelf === 'currently_reading' ? 'bg-amber-500 text-[#151311]' : 'text-[#A69785] hover:text-white bg-[#28231E]' }}">
-                    Currently reading
-                </a>
-                <a href="{{ route('admin.dashboard', ['shelf' => 'next_up', 'q' => request('q')]) }}" 
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ $shelf === 'next_up' ? 'bg-amber-500 text-[#151311]' : 'text-[#A69785] hover:text-white bg-[#28231E]' }}">
-                    Next up
-                </a>
-                <a href="{{ route('admin.dashboard', ['shelf' => 'finished', 'q' => request('q')]) }}" 
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ $shelf === 'finished' ? 'bg-amber-500 text-[#151311]' : 'text-[#A69785] hover:text-white bg-[#28231E]' }}">
-                    Finished
-                </a>
+                @foreach($categories as $cat)
+                    <a href="{{ route('admin.dashboard', ['category' => $cat, 'q' => request('q')]) }}" 
+                       class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ $category === $cat ? 'bg-amber-500 text-[#151311]' : 'text-[#A69785] hover:text-white bg-[#28231E]' }}">
+                        {{ $cat }}
+                    </a>
+                @endforeach
             </div>
 
             <!-- Search Input -->
             <form action="{{ route('admin.dashboard') }}" method="GET" class="relative w-full md:w-72">
-                @if($shelf)
-                    <input type="hidden" name="shelf" value="{{ $shelf }}">
+                @if($category)
+                    <input type="hidden" name="category" value="{{ $category }}">
                 @endif
                 <i data-lucide="search" class="w-4 h-4 text-[#8E8070] absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                 <input type="text" 

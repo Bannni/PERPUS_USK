@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Route;
 // Public Landing Page
 Route::get('/', [BookController::class, 'landing'])->name('home');
 
-// Bookstore Catalog / Library (Matches reference design)
-Route::get('/catalog', [BookController::class, 'catalog'])->name('catalog');
-Route::get('/library', [BookController::class, 'catalog'])->name('library'); // Alias
+// Toko Buku (Shop / Storefront where all books are sold)
+Route::get('/shop', [BookController::class, 'shop'])->name('shop');
+
+// Perpustakaan Pribadi (My Library - Shelves grouped by genre for purchased books)
+Route::get('/catalog', [BookController::class, 'myLibrary'])->name('catalog');
+Route::get('/library', [BookController::class, 'myLibrary'])->name('library');
 
 // API for quick book modal details
 Route::get('/api/books/{id}', [BookController::class, 'show'])->name('books.show');
@@ -40,5 +43,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/books', [AdminBookController::class, 'store'])->name('books.store');
     Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('books.update');
     Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('books.destroy');
+    Route::get('/users', [AdminBookController::class, 'users'])->name('users');
     Route::get('/orders', [AdminBookController::class, 'orders'])->name('orders');
 });
