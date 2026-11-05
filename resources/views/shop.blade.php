@@ -132,7 +132,10 @@
                     <div>
                         <!-- Cover -->
                         <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-sm border border-[#E9DFD2] bg-[#FAF7F2] relative">
-                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="{{ $book->cover_url }}" 
+                                 alt="{{ $book->title }}" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             
                             <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-xs text-[#7A5034] text-[10px] font-bold px-1.5 py-0.5 rounded shadow-xs">
                                 ★ {{ $book->rating }}
@@ -213,8 +216,11 @@
             <template x-if="selectedBook">
                 <div>
                     <div class="flex items-center gap-4 pb-4 border-b border-[#E8DEC0] mb-5">
-                        <div class="w-16 h-24 rounded-lg overflow-hidden shadow-sm shrink-0 border border-[#DACBB8]">
-                            <img :src="selectedBook.cover_url" :alt="selectedBook.title" class="w-full h-full object-cover">
+                        <div class="w-16 h-24 rounded-lg overflow-hidden shadow-sm shrink-0 border border-[#DACBB8] bg-[#FAF7F2]">
+                            <img :src="selectedBook.cover_url" 
+                                 :alt="selectedBook.title" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
+                                 class="w-full h-full object-cover">
                         </div>
                         <div>
                             <span class="text-[10px] uppercase font-bold tracking-wider text-[#9C6D47] bg-[#EFE4D6] px-2 py-0.5 rounded-full" x-text="selectedBook.category"></span>

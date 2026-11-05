@@ -205,8 +205,11 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
                 @foreach($featuredBooks as $book)
                     <a href="{{ route('catalog') }}" class="group block">
-                        <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-300 border border-[#E5D7C5]">
-                            <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                        <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-300 border border-[#E5D7C5] bg-[#EFE7DC]">
+                            <img src="{{ $book->cover_url }}" 
+                                 alt="{{ $book->title }}" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
+                                 class="w-full h-full object-cover">
                         </div>
                         <div class="mt-3">
                             <span class="text-[10px] uppercase font-bold text-[#8C7A6D] block">{{ $book->category }}</span>

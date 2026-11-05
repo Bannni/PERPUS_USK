@@ -180,7 +180,10 @@
                             <!-- Top Info & Cover -->
                             <div class="flex gap-4">
                                 <div class="w-24 sm:w-28 aspect-[2/3] shrink-0 rounded-xl overflow-hidden shadow-md border border-[#42392E] bg-[#2E2822]">
-                                    <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                                    <img src="{{ $book->cover_url }}" 
+                                         alt="{{ $book->title }}" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
+                                         class="w-full h-full object-cover group-hover:scale-105 transition">
                                 </div>
 
                                 <div class="flex-1 overflow-hidden flex flex-col justify-between">
@@ -265,7 +268,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('admin.books.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -281,16 +284,16 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Kategori *</label>
-                        <input type="text" name="category" required placeholder="Contoh: Fantasy / Design" class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                        <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Kategori / Genre *</label>
+                        <input type="text" name="category" required placeholder="Contoh: Fantasy / Design / Technology" class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Bagian Rak *</label>
-                        <select name="shelf_section" required class="w-full px-3 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
-                            <option value="next_up">Next up (Tengah)</option>
-                            <option value="currently_reading">Currently reading (Atas)</option>
-                            <option value="finished">Finished (Bawah)</option>
+                        <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Bagian Rak</label>
+                        <select name="shelf_section" class="w-full px-3 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                            <option value="next_up">Next up (Standar)</option>
+                            <option value="currently_reading">Currently reading</option>
+                            <option value="finished">Finished</option>
                         </select>
                     </div>
 
@@ -300,9 +303,16 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">URL Sampul Buku (Image URL) *</label>
-                    <input type="url" name="cover_url" required placeholder="https://images.unsplash.com/... atau URL gambar buku" class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                <!-- Cover Image (Upload or URL) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#26211A] p-3 rounded-2xl border border-[#3D352A]">
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 mb-1">Unggah Berkas Gambar Sampul</label>
+                        <input type="file" name="cover_file" accept="image/*" class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Gunakan URL Gambar Eksternal</label>
+                        <input type="url" name="cover_url" placeholder="https://... (jika tidak upload file)" class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-4">
@@ -359,7 +369,7 @@
                         </button>
                     </div>
 
-                    <form :action="'{{ url('/admin/books') }}/' + selectedBook.id" method="POST" class="space-y-4">
+                    <form :action="'{{ url('/admin/books') }}/' + selectedBook.id" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         @method('PUT')
 
@@ -377,16 +387,16 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Kategori *</label>
+                                <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Kategori / Genre *</label>
                                 <input type="text" name="category" x-model="selectedBook.category" required class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Bagian Rak *</label>
-                                <select name="shelf_section" x-model="selectedBook.shelf_section" required class="w-full px-3 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
-                                    <option value="currently_reading">Currently reading (Atas)</option>
-                                    <option value="next_up">Next up (Tengah)</option>
-                                    <option value="finished">Finished (Bawah)</option>
+                                <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Bagian Rak</label>
+                                <select name="shelf_section" x-model="selectedBook.shelf_section" class="w-full px-3 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                                    <option value="currently_reading">Currently reading</option>
+                                    <option value="next_up">Next up</option>
+                                    <option value="finished">Finished</option>
                                 </select>
                             </div>
 
@@ -396,9 +406,16 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">URL Sampul Buku *</label>
-                            <input type="url" name="cover_url" x-model="selectedBook.cover_url" required class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                        <!-- Cover Image (Upload or URL) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#26211A] p-3 rounded-2xl border border-[#3D352A]">
+                            <div>
+                                <label class="block text-xs font-semibold text-amber-300 mb-1">Ganti Berkas Sampul</label>
+                                <input type="file" name="cover_file" accept="image/*" class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Ubah URL Gambar</label>
+                                <input type="url" name="cover_url" x-model="selectedBook.cover_url" class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4">

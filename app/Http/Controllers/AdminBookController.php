@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminBookController extends Controller
 {
@@ -55,8 +56,9 @@ class AdminBookController extends Controller
     /**
      * Display user data monitoring for admin.
      */
-    public function users(Request $request)
+    public function users(?Request $request = null)
     {
+        $request = $request ?? request();
         $search = $request->input('q');
 
         $query = User::withCount(['orders' => function ($q) {
@@ -92,7 +94,8 @@ class AdminBookController extends Controller
             'category' => ['required', 'string', 'max:100'],
             'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
             'price' => ['required', 'integer', 'min:0'],
-            'cover_url' => ['required', 'url', 'max:500'],
+            'cover_url' => ['nullable', 'string', 'max:500'],
+            'cover_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
             'rating' => ['nullable', 'numeric', 'min:1', 'max:5'],
             'pages' => ['nullable', 'integer', 'min:1'],
             'published_year' => ['nullable', 'integer', 'min:1800', 'max:' . (date('Y') + 1)],
@@ -102,12 +105,17 @@ class AdminBookController extends Controller
             'author.required' => 'Nama penulis wajib diisi.',
             'category.required' => 'Kategori / Genre wajib diisi.',
             'price.required' => 'Harga buku wajib diisi.',
-            'cover_url.required' => 'URL sampul buku wajib diisi.',
-            'cover_url.url' => 'Format URL sampul tidak valid.',
         ]);
 
+        if ($request->hasFile('cover_file')) {
+            $path = $request->file('cover_file')->store('covers', 'public');
+            $validated['cover_url'] = '/storage/' . $path;
+        } elseif (empty($validated['cover_url'])) {
+            $validated['cover_url'] = 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';
+        }
+
         $validated['shelf_section'] = $validated['shelf_section'] ?? 'next_up';
-        $validated['rating'] = $validated['rating'] ?? 4.5;
+        $validated['rating'] = $validated['rating'] ?? 4.8;
         $validated['pages'] = $validated['pages'] ?? 250;
 
         Book::create($validated);
@@ -128,12 +136,20 @@ class AdminBookController extends Controller
             'category' => ['required', 'string', 'max:100'],
             'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
             'price' => ['required', 'integer', 'min:0'],
-            'cover_url' => ['required', 'url', 'max:500'],
+            'cover_url' => ['nullable', 'string', 'max:500'],
+            'cover_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
             'rating' => ['nullable', 'numeric', 'min:1', 'max:5'],
             'pages' => ['nullable', 'integer', 'min:1'],
             'published_year' => ['nullable', 'integer'],
             'synopsis' => ['nullable', 'string'],
         ]);
+
+        if ($request->hasFile('cover_file')) {
+            $path = $request->file('cover_file')->store('covers', 'public');
+            $validated['cover_url'] = '/storage/' . $path;
+        } elseif (empty($validated['cover_url'])) {
+            $validated['cover_url'] = $book->cover_url;
+        }
 
         $book->update($validated);
 
@@ -147,6 +163,12 @@ class AdminBookController extends Controller
     {
         $book = Book::findOrFail($id);
         $title = $book->title;
+
+        if ($book->cover_url && str_starts_with($book->cover_url, '/storage/covers/')) {
+            $relPath = str_replace('/storage/', '', $book->cover_url);
+            Storage::disk('public')->delete($relPath);
+        }
+
         $book->delete();
 
         return redirect()->route('admin.dashboard')->with('success', "Buku '{$title}' telah berhasil dihapus dari sistem.");

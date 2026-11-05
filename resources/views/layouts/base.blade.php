@@ -153,11 +153,14 @@
     @yield('content')
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        const initLucide = () => {
             if (window.lucide) {
                 lucide.createIcons();
             }
-        });
+        };
+        document.addEventListener('DOMContentLoaded', initLucide);
+        document.addEventListener('alpine:initialized', initLucide);
+        window.addEventListener('click', () => setTimeout(initLucide, 50));
     </script>
     @stack('scripts')
 </body>
