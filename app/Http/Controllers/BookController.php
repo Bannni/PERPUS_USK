@@ -44,16 +44,21 @@ class BookController extends Controller
         if (!Auth::check()) {
             $genresWithBooks = collect();
             $myBooks = collect();
-            $continueReadingBook = null;
+            $latestPurchasedBook = null;
         } else {
             $userId = Auth::id();
+
+            // Only books with confirmed/approved orders (status: completed/processing/success) appear on the shelf.
+            // Pending orders DO NOT appear until approved by Admin.
+            $confirmedStatuses = ['completed', 'processing', 'success'];
+
             $fromOrders = Order::where('user_id', $userId)
-                ->whereIn('status', ['completed', 'processing', 'pending'])
+                ->whereIn('status', $confirmedStatuses)
                 ->pluck('book_id');
 
-            $fromItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($userId) {
+            $fromItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($userId, $confirmedStatuses) {
                 $q->where('user_id', $userId)
-                  ->whereIn('status', ['completed', 'processing', 'pending']);
+                  ->whereIn('status', $confirmedStatuses);
             })->pluck('book_id');
 
             $purchasedBookIds = $fromOrders->merge($fromItems)->unique();
@@ -70,16 +75,19 @@ class BookController extends Controller
 
             $myBooks = $query->get();
 
-            // Group by genre / category (as requested!)
+            // Group by genre / category
             $genresWithBooks = $myBooks->groupBy('category');
 
-            // Latest book for continue reading widget
-            $continueReadingBook = $myBooks->first();
+            // Latest purchased book for sidebar showcase widget
+            $latestPurchasedBook = $myBooks->first();
         }
+
+        $continueReadingBook = $latestPurchasedBook; // backward compatibility
 
         return view('catalog', compact(
             'genresWithBooks',
             'myBooks',
+            'latestPurchasedBook',
             'continueReadingBook',
             'search',
             'activeTab'

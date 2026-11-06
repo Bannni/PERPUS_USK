@@ -513,9 +513,9 @@
                                                 @csrf
                                                 @method('PUT')
                                                 <select name="status" class="px-2.5 py-1.5 bg-[#26211A] border border-[#3D352A] rounded-lg text-xs font-semibold text-white focus:outline-none focus:border-amber-400">
-                                                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending (Menunggu ACC)</option>
-                                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing (ACC / Diproses)</option>
-                                                    <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed (Selesai)</option>
+                                                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending (Menunggu)</option>
+                                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing (Dikirim)</option>
+                                                    <option value="completed" {{ in_array($order->status, ['completed', 'success']) ? 'selected' : '' }}>Success / Selesai (ACC)</option>
                                                     <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled (Batal)</option>
                                                 </select>
                                                 <button type="submit" class="px-2.5 py-1.5 bg-[#3D352A] hover:bg-amber-500 hover:text-[#151311] text-amber-300 text-xs font-bold rounded-lg transition" title="Simpan Status & Update Stok">

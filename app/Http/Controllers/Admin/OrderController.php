@@ -26,10 +26,13 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:pending,processing,completed,cancelled'],
+            'status' => ['required', 'in:pending,processing,completed,success,cancelled'],
         ]);
 
         $newStatus = $validated['status'];
+        if ($newStatus === 'success') {
+            $newStatus = 'completed';
+        }
 
         try {
             DB::beginTransaction();
@@ -39,7 +42,7 @@ class OrderController extends Controller
                 ->findOrFail($id);
 
             $oldStatus = $order->status;
-            $isApprovedStatus = in_array($newStatus, ['processing', 'completed']);
+            $isApprovedStatus = in_array($newStatus, ['processing', 'completed', 'success']);
             $isCancelledOrPending = in_array($newStatus, ['cancelled', 'pending']);
 
             // Helper to get all order items

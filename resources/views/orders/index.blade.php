@@ -58,9 +58,9 @@
         <!-- Title & Stats Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
-                <span class="text-xs uppercase font-bold tracking-widest text-[#8C8075]">Arsip Pembaca</span>
-                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#1C1815] mt-1">Buku yang Telah Dibeli</h1>
-                <p class="text-xs sm:text-sm text-[#7A6E63] mt-1">Daftar buku yang sudah Anda beli dan siap dibaca kapan saja.</p>
+                <span class="text-xs uppercase font-bold tracking-widest text-[#8C8075]">Pesanan & Koleksi</span>
+                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#1C1815] mt-1">Daftar Buku yang Dibeli</h1>
+                <p class="text-xs sm:text-sm text-[#7A6E63] mt-1">Daftar pesanan buku fisik yang telah Anda beli dan dikirim ke alamat rumah Anda.</p>
             </div>
 
             <div class="flex items-center gap-4">
