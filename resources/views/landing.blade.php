@@ -3,14 +3,13 @@
 @section('title', 'Readowl Bookstore - Find Your Book')
 
 @section('content')
-<div class="min-h-screen bg-[#181614] text-[#2D231E]">
+<div class="min-h-screen bg-[#F0EDE6] text-[#2D231E]">
 
-    <!-- HERO SECTION (EDITORIAL CURATION / FIND YOUR BOOK - MATCHING REFERENCE IMAGE) -->
-    <section class="p-3 sm:p-6 lg:p-8">
-        <div class="bg-[#F0EDE6] rounded-[24px] sm:rounded-[36px] overflow-hidden border border-[#DDD7CD] shadow-2xl min-h-[92vh] flex flex-col justify-between p-6 sm:p-10 lg:p-14 relative">
+    <!-- HERO SECTION (FULL FRAME EDITORIAL CURATION / FIND YOUR BOOK) -->
+    <section class="min-h-screen w-full bg-[#F0EDE6] flex flex-col justify-between px-6 sm:px-12 lg:px-20 py-8 lg:py-12 border-b border-[#DDD7CD] relative">
             
-            <!-- Top Header Inside Editorial Frame -->
-            <header class="flex items-center justify-between text-xs tracking-widest uppercase font-semibold text-[#5C534B]">
+        <!-- Top Header Full Frame -->
+        <header class="w-full flex items-center justify-between text-xs tracking-widest uppercase font-semibold text-[#5C534B]">
                 <!-- Brand Left -->
                 <div class="flex items-center gap-3">
                     <a href="{{ route('home') }}" class="font-serif text-xl sm:text-2xl font-bold tracking-tighter text-[#1C1815] hover:opacity-80 transition">
@@ -18,10 +17,7 @@
                     </a>
                 </div>
 
-                <!-- Center Subtitle / Tag -->
-                <div class="hidden sm:block text-[11px] text-[#8C8277] tracking-[0.25em]">
-                    THE EDITORIAL ARCHIVE • VOL. 01
-                </div>
+              
 
                 <!-- Right Nav Links -->
                 <div class="flex items-center gap-4 sm:gap-6">
@@ -61,9 +57,7 @@
 
             <!-- Main Big Editorial Headline (FIND YOUR BOOK) -->
             <div class="text-center my-8 sm:my-12">
-                <span class="block text-[11px] sm:text-xs tracking-[0.3em] uppercase text-[#8C8277] font-medium mb-3">
-                    PART 1
-                </span>
+               
                 <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-[#1C1815] uppercase font-light leading-[1.05]">
                     FIND YOUR BOOK
                 </h1>
@@ -183,13 +177,18 @@
             </div>
 
             <!-- Bottom Action & Indicator -->
-            <div class="flex flex-col sm:flex-row items-center justify-between pt-6 text-xs text-[#7A6E63] gap-4">
+            <div class="w-full flex flex-col sm:flex-row items-center justify-between pt-8 text-xs text-[#7A6E63] gap-4">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-[#1C1815] animate-pulse"></span>
                     <span>Klik buku pada baris di atas untuk membuka katalog interaktif</span>
                 </div>
                 
                 <div class="flex items-center gap-4">
+                    <a href="{{ route('shop') }}" class="font-semibold text-[#7A5034] hover:underline flex items-center gap-1 group">
+                        <span>Toko Buku (Shop)</span>
+                        <span class="group-hover:translate-x-1 transition">→</span>
+                    </a>
+                    <span>•</span>
                     <a href="{{ route('catalog') }}" class="font-semibold text-[#1C1815] hover:underline flex items-center gap-1 group">
                         <span>Buka Rak Buku 3D Lengkap</span>
                         <span class="group-hover:translate-x-1 transition">→</span>
@@ -197,7 +196,6 @@
                 </div>
             </div>
 
-        </div>
     </section>
 
     <!-- FEATURED BOOKS LIST -->
