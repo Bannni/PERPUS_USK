@@ -14,6 +14,11 @@ class BookController extends Controller
      */
     public function landing()
     {
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Akses ditolak! Administrator diarahkan langsung ke Panel Admin Studio.');
+        }
+
         $featuredBooks = Book::take(6)->get();
         $totalBooks = Book::count();
         $categories = Book::select('category')->distinct()->pluck('category');
@@ -28,6 +33,11 @@ class BookController extends Controller
      */
     public function myLibrary(Request $request)
     {
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Akses ditolak! Administrator tidak diizinkan mengakses halaman My Library pembaca.');
+        }
+
         $search = $request->input('q');
         $activeTab = $request->input('tab', 'shelves'); // 'shelves' or 'all'
 
@@ -82,6 +92,11 @@ class BookController extends Controller
      */
     public function shop(Request $request)
     {
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Akses ditolak! Administrator tidak diizinkan mengakses Toko / Belanja Buku.');
+        }
+
         $search = $request->input('q');
         $selectedCategory = $request->input('category');
 

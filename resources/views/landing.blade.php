@@ -37,12 +37,6 @@
                             @endif
                         </a>
 
-                        @if(Auth::user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-1.5 bg-amber-600 text-white rounded-full text-xs font-semibold hover:bg-amber-700 transition flex items-center gap-1.5 shadow-sm">
-                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                                <span>Studio Admin</span>
-                            </a>
-                        @endif
                         <a href="{{ route('catalog') }}" class="px-4 py-1.5 bg-[#1C1815] text-[#F0EDE6] rounded-full text-xs font-semibold hover:bg-[#3D332B] transition">
                             My Library
                         </a>
@@ -54,6 +48,20 @@
                     @endauth
                 </div>
             </header>
+
+            @if(session('error'))
+                <div class="mt-4 p-4 bg-red-100 border border-red-300 text-red-900 text-xs sm:text-sm rounded-2xl flex items-center gap-3">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 shrink-0"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="mt-4 p-4 bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs sm:text-sm rounded-2xl flex items-center gap-3">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
 
             <!-- Main Big Editorial Headline (FIND YOUR BOOK) -->
             <div class="text-center my-8 sm:my-12">

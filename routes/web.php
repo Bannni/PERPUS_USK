@@ -15,28 +15,30 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (Standar BNSP Junior Web Developer)
+| Public & Reader Routes (Protected from Admin access via 'user' middleware)
 |--------------------------------------------------------------------------
 */
-// GET / -> BookController@index (Landing page & Editorial catalog)
-Route::get('/', [BookController::class, 'landing'])->name('home');
+Route::middleware('user')->group(function () {
+    // GET / -> BookController@landing (Landing page & Editorial catalog)
+    Route::get('/', [BookController::class, 'landing'])->name('home');
 
-// GET /about -> PageController@about (Profil Toko BookStore)
-Route::get('/about', [PageController::class, 'about'])->name('about');
+    // GET /about -> PageController@about (Profil Toko BookStore)
+    Route::get('/about', [PageController::class, 'about'])->name('about');
 
-// GET|POST /contact -> ContactController@form / store (Form Kontak Pengunjung)
-Route::get('/contact', [ContactController::class, 'form'])->name('contact');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+    // GET|POST /contact -> ContactController@form / store (Form Kontak Pengunjung)
+    Route::get('/contact', [ContactController::class, 'form'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-// Toko Buku (Shop Storefront)
-Route::get('/shop', [BookController::class, 'shop'])->name('shop');
+    // Toko Buku (Shop Storefront)
+    Route::get('/shop', [BookController::class, 'shop'])->name('shop');
 
-// Perpustakaan Pribadi (My Library - Rak 3D)
-Route::get('/catalog', [BookController::class, 'myLibrary'])->name('catalog');
-Route::get('/library', [BookController::class, 'myLibrary'])->name('library');
+    // Perpustakaan Pribadi (My Library - Rak 3D)
+    Route::get('/catalog', [BookController::class, 'myLibrary'])->name('catalog');
+    Route::get('/library', [BookController::class, 'myLibrary'])->name('library');
 
-// API for quick modal details
-Route::get('/api/books/{id}', [BookController::class, 'show'])->name('books.show');
+    // API for quick modal details
+    Route::get('/api/books/{id}', [BookController::class, 'show'])->name('books.show');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -53,12 +55,19 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated User Routes (Auth)
+| Common Authenticated Routes (Accessible by any logged-in user / admin)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
 
+/*
+|--------------------------------------------------------------------------
+| Authenticated Reader Only Routes (Auth + UserOnly middleware)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'user'])->group(function () {
     // GET|POST /cart -> CartController@index / store (Keranjang Belanja)
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');

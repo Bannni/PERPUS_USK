@@ -45,12 +45,6 @@
                     </a>
 
                     <a href="{{ route('orders.index') }}" class="text-xs font-semibold text-[#5F3D27] hover:underline hidden sm:inline">Pesanan Saya</a>
-
-                    @if(Auth::user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-1.5 bg-[#1C1815] text-amber-300 rounded-xl text-xs font-semibold hover:bg-black transition">
-                            Admin
-                        </a>
-                    @endif
                 @else
                     <a href="{{ route('login') }}" class="px-4 py-2 text-xs font-semibold text-[#5F3D27] hover:underline">Masuk</a>
                     <a href="{{ route('register') }}" class="px-4 py-2 bg-[#7A5034] text-white text-xs font-semibold rounded-xl hover:bg-[#5F3D27] transition">Daftar</a>

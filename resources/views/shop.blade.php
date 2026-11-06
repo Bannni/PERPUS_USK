@@ -38,11 +38,6 @@
                 <a href="{{ route('contact') }}" class="hover:text-[#5F3D27] transition">Kontak</a>
                 @auth
                     <a href="{{ route('orders.index') }}" class="hover:text-[#5F3D27] transition">Pesanan Saya</a>
-                    @if(Auth::user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="px-3 py-1 bg-[#1C1815] text-amber-300 rounded-xl text-xs font-semibold hover:bg-black transition">
-                            Admin
-                        </a>
-                    @endif
                 @endauth
             </nav>
 
@@ -84,6 +79,13 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
         <!-- Alerts -->
+        @if(session('error'))
+            <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm rounded-2xl flex items-center gap-3 shadow-xs">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 shrink-0"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between gap-3 shadow-xs">
                 <div class="flex items-center gap-2.5">

@@ -45,12 +45,6 @@
                     </a>
 
                     <a href="{{ route('orders.index') }}" class="text-xs font-semibold text-[#5F3D27] hover:underline hidden sm:inline">Pesanan Saya</a>
-
-                    @if(Auth::user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-1.5 bg-[#1C1815] text-amber-300 rounded-xl text-xs font-semibold hover:bg-black transition">
-                            Admin
-                        </a>
-                    @endif
                 @else
                     <a href="{{ route('login') }}" class="px-4 py-2 text-xs font-semibold text-[#5F3D27] hover:underline">Masuk</a>
                     <a href="{{ route('register') }}" class="px-4 py-2 bg-[#7A5034] text-white text-xs font-semibold rounded-xl hover:bg-[#5F3D27] transition">Daftar</a>
@@ -78,7 +72,7 @@
         <!-- Editorial Story Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center mb-16">
             <div class="rounded-3xl overflow-hidden shadow-xl border border-[#E7DCCE] bg-[#F2E8DC] aspect-[4/3] relative">
-                <img src="https://images.unsplash.com/photo-1507842229458-57793b582697?auto=format&fit=crop&w=1200&q=80" 
+                <img src="https://img.peerspace.com/image/upload/f_auto,q_auto,dpr_auto,w_3840/b9eh6ktvabfzevgk9gda" 
                      alt="Readowl Library Studio" 
                      class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6 sm:p-8 text-white">

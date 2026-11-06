@@ -41,6 +41,13 @@
     <main class="max-w-7xl mx-auto w-full py-8 flex-1">
         
         <!-- Alerts -->
+        @if(session('error'))
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm rounded-2xl flex items-center gap-2.5">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 shrink-0"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-2xl flex items-center gap-2.5">
                 <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 shrink-0"></i>

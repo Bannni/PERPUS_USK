@@ -17,11 +17,11 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Silakan masuk terlebih dahulu untuk mengakses halaman admin.');
+            return redirect()->route('login')->with('error', 'Silakan masuk terlebih dahulu untuk mengakses halaman administrator.');
         }
 
         if (!Auth::user()->isAdmin()) {
-            return redirect()->route('home')->with('error', 'Akses ditolak! Anda tidak memiliki izin Administrator.');
+            return redirect()->route('catalog')->with('error', 'Akses ditolak! Anda tidak memiliki izin Administrator.');
         }
 
         return $next($request);

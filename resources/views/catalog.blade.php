@@ -80,15 +80,6 @@
                         <i data-lucide="receipt" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
                         <span class="font-medium text-sm">Pesanan Saya</span>
                     </a>
-
-                    @if(Auth::user()->isAdmin())
-                        <div class="pt-3">
-                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#1C1815] text-amber-300 font-semibold text-xs shadow-md hover:bg-black transition border border-amber-400/20">
-                                <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
-                                <span>Panel Admin Kurator</span>
-                            </a>
-                        </div>
-                    @endif
                 @endauth
 
                 <div class="pt-2 border-t border-[#E8DDCE]/50 space-y-1">
@@ -139,7 +130,7 @@
                             </div>
                             <div class="overflow-hidden">
                                 <p class="text-xs font-bold text-[#4A3222] truncate">{{ Auth::user()->name }}</p>
-                                <p class="text-[10px] text-[#8C7A6D] truncate">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'Pembaca' }}</p>
+                                <p class="text-[10px] text-[#8C7A6D] truncate">Pembaca Terdaftar</p>
                             </div>
                         </div>
                         <form action="{{ route('logout') }}" method="POST">
@@ -166,6 +157,13 @@
     <!-- MAIN BOOKCASE CONTAINER (SCROLLABLE CANVAS) -->
     <main class="flex-1 md:h-full md:overflow-y-auto bg-[#FAF7F2] border border-[#EADECF] rounded-[32px] p-5 sm:p-7 md:p-8 lg:p-10 shadow-sm flex flex-col justify-between scroll-smooth">
         <div>
+            @if(session('error'))
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm rounded-2xl flex items-center gap-3 shadow-xs">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 shrink-0"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
             @if(session('success'))
                 <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between gap-3 shadow-xs">
                     <div class="flex items-center gap-2.5">
