@@ -78,7 +78,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'min:10', 'max:15', 'regex:/^[0-9+]+$/'],
+            'phone' => ['required', 'string', 'min:10', 'max:15', 'regex:/^\+?[0-9]+$/'],
             'password' => [
                 'required',
                 'string',
@@ -96,7 +96,7 @@ class AuthController extends Controller
             'phone.required' => 'Nomor telepon wajib diisi.',
             'phone.min' => 'Nomor telepon minimal 10 digit.',
             'phone.max' => 'Nomor telepon maksimal 15 digit.',
-            'phone.regex' => 'Nomor telepon hanya boleh berupa angka (dan tanda +).',
+            'phone.regex' => 'Format nomor telepon tidak valid. Tanda plus (+) hanya boleh ada satu di awal nomor dan tidak boleh ada karakter selain angka.',
             'password.required' => 'Kata sandi wajib diisi.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);

@@ -109,7 +109,8 @@
                                required 
                                maxlength="15"
                                value="{{ old('phone') }}"
-                               placeholder="081234567890" 
+                               placeholder="081234567890 atau +628123456789" 
+                               oninput="this.value = this.value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '')"
                                class="w-full px-4 py-2.5 bg-[#FAF9F5] border border-[#E5E0D6] rounded-2xl text-xs sm:text-sm text-[#1C1815] placeholder-[#B5ABA0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1C1815] focus:border-transparent transition">
                     </div>
 
