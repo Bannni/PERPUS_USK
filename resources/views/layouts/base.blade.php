@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>@yield('title', 'Readowl Bookstore - Temukan Inspirasi Membacamu')</title>
 
     <!-- Google Fonts -->
@@ -161,6 +164,13 @@
         document.addEventListener('DOMContentLoaded', initLucide);
         document.addEventListener('alpine:initialized', initLucide);
         window.addEventListener('click', () => setTimeout(initLucide, 50));
+
+        // Invalidate back-forward cache after logout
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
     </script>
     @stack('scripts')
 </body>

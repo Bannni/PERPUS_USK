@@ -38,50 +38,48 @@ class BookController extends Controller
                 ->with('error', 'Akses ditolak! Administrator tidak diizinkan mengakses halaman My Library pembaca.');
         }
 
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('error', 'Silakan masuk terlebih dahulu untuk mengakses rak buku pribadi Anda.');
+        }
+
         $search = $request->input('q');
         $activeTab = $request->input('tab', 'shelves'); // 'shelves' or 'all'
 
-        if (!Auth::check()) {
-            $genresWithBooks = collect();
-            $myBooks = collect();
-            $latestPurchasedBook = null;
-        } else {
-            $userId = Auth::id();
+        $userId = Auth::id();
 
-            // Only books with confirmed/approved orders (status: completed/processing/success) appear on the shelf.
-            // Pending orders DO NOT appear until approved by Admin.
-            $confirmedStatuses = ['completed', 'processing', 'success'];
+        // Only books with confirmed/approved orders (status: completed/processing/success) appear on the shelf.
+        // Pending orders DO NOT appear until approved by Admin.
+        $confirmedStatuses = ['completed', 'processing', 'success'];
 
-            $fromOrders = Order::where('user_id', $userId)
-                ->whereIn('status', $confirmedStatuses)
-                ->pluck('book_id');
+        $fromOrders = Order::where('user_id', $userId)
+            ->whereIn('status', $confirmedStatuses)
+            ->pluck('book_id');
 
-            $fromItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($userId, $confirmedStatuses) {
-                $q->where('user_id', $userId)
-                  ->whereIn('status', $confirmedStatuses);
-            })->pluck('book_id');
+        $fromItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($userId, $confirmedStatuses) {
+            $q->where('user_id', $userId)
+              ->whereIn('status', $confirmedStatuses);
+        })->pluck('book_id');
 
-            $purchasedBookIds = $fromOrders->merge($fromItems)->unique();
+        $purchasedBookIds = $fromOrders->merge($fromItems)->unique();
 
-            $query = Book::with('stock')->whereIn('id', $purchasedBookIds);
+        $query = Book::with('stock')->whereIn('id', $purchasedBookIds);
 
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('author', 'like', "%{$search}%")
-                      ->orWhere('category', 'like', "%{$search}%");
-                });
-            }
-
-            $myBooks = $query->get();
-
-            // Group by genre / category
-            $genresWithBooks = $myBooks->groupBy('category');
-
-            // Latest purchased book for sidebar showcase widget
-            $latestPurchasedBook = $myBooks->first();
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('author', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
         }
 
+        $myBooks = $query->get();
+
+        // Group by genre / category
+        $genresWithBooks = $myBooks->groupBy('category');
+
+        // Latest purchased book for sidebar showcase widget
+        $latestPurchasedBook = $myBooks->first();
         $continueReadingBook = $latestPurchasedBook; // backward compatibility
 
         return view('catalog', compact(

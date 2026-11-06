@@ -289,7 +289,7 @@
             </div>
         </div>
     </section>
-
+    
     <!-- FOOTER -->
     <footer class="bg-[#181614] border-t border-[#2B2724] py-10 text-center text-xs text-[#8C8277]">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">

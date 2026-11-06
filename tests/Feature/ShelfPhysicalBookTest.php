@@ -52,6 +52,37 @@ class ShelfPhysicalBookTest extends TestCase
     }
 
     /**
+     * Test that guest (unauthenticated) CANNOT access shelves and is redirected to login.
+     */
+    public function test_guest_is_redirected_to_login_when_accessing_shelves()
+    {
+        $response = $this->get('/catalog');
+        $response->assertRedirect(route('login'));
+
+        $responseLibrary = $this->get('/library');
+        $responseLibrary->assertRedirect(route('login'));
+    }
+
+    /**
+     * Test that after logout, accessing shelves redirects to login and sends no-cache headers.
+     */
+    public function test_user_cannot_access_shelves_after_logout()
+    {
+        // 1. User is logged in and can view shelves
+        $this->actingAs($this->user)->get('/catalog')->assertStatus(200);
+
+        // 2. User logs out
+        $this->post('/logout')->assertRedirect(route('home'));
+
+        // 3. User tries to view shelves again -> MUST REDIRECT TO LOGIN
+        $response = $this->get('/catalog');
+        $response->assertRedirect(route('login'));
+
+        // 4. Assert headers prevent back-history caching
+        $response->assertHeader('Cache-Control');
+    }
+
+    /**
      * Test that pending orders DO NOT appear in My Library / Shelves.
      */
     public function test_pending_orders_do_not_appear_on_shelves()

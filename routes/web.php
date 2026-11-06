@@ -32,10 +32,6 @@ Route::middleware('user')->group(function () {
     // Toko Buku (Shop Storefront)
     Route::get('/shop', [BookController::class, 'shop'])->name('shop');
 
-    // Perpustakaan Pribadi (My Library - Rak 3D)
-    Route::get('/catalog', [BookController::class, 'myLibrary'])->name('catalog');
-    Route::get('/library', [BookController::class, 'myLibrary'])->name('library');
-
     // API for quick modal details
     Route::get('/api/books/{id}', [BookController::class, 'show'])->name('books.show');
 });
@@ -68,6 +64,10 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'user'])->group(function () {
+    // Perpustakaan Pribadi (My Library - Rak 3D Buku Fisik Terbeli, Wajib Login)
+    Route::get('/catalog', [BookController::class, 'myLibrary'])->name('catalog');
+    Route::get('/library', [BookController::class, 'myLibrary'])->name('library');
+
     // GET|POST /cart -> CartController@index / store (Keranjang Belanja)
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
