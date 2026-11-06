@@ -6,36 +6,7 @@
 <div class="min-h-screen bg-[#FAF7F2] text-[#2D231E]">
 
     <!-- TOP HEADER -->
-    <header class="border-b border-[#EFE5D7] bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('home') }}" class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-full bg-[#EFE4D6] flex items-center justify-center text-[#7A5034]">
-                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="font-serif text-2xl font-bold tracking-tight text-[#5F3D27] block leading-none">Readowl Cart</span>
-                        <span class="text-[9px] uppercase tracking-widest text-[#9C8B7E]">Keranjang Belanja Pengguna</span>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Nav Links -->
-            <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-[#7A6B60]">
-                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] transition">Beranda</a>
-                <a href="{{ route('shop') }}" class="hover:text-[#5F3D27] transition">Toko Buku</a>
-                <a href="{{ route('catalog') }}" class="hover:text-[#5F3D27] transition">Rak 3D</a>
-                <a href="{{ route('about') }}" class="hover:text-[#5F3D27] transition">Tentang Kami</a>
-                <a href="{{ route('contact') }}" class="hover:text-[#5F3D27] transition">Kontak</a>
-            </nav>
-
-            <div class="flex items-center gap-3">
-                <a href="{{ route('orders.index') }}" class="px-3.5 py-1.5 bg-[#EFE4D6] text-[#7A5034] rounded-xl text-xs font-semibold hover:bg-[#E5D7C5] transition">
-                    Pesanan Saya
-                </a>
-            </div>
-        </div>
-    </header>
+    @include('partials.navbar')
 
     <!-- MAIN CART CONTENT -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">

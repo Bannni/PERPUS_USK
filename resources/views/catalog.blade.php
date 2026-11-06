@@ -3,7 +3,7 @@
 @section('title', 'My Library - Rak Buku Koleksi Saya')
 
 @section('content')
-<div class="min-h-screen md:h-screen md:overflow-hidden bg-[#F4ECE1]/60 flex flex-col md:flex-row p-3 md:p-6 lg:p-8 gap-5" x-data="{
+<div class="min-h-screen bg-[#FAF7F2] text-[#2D231E]" x-data="{
     activeTab: '{{ $activeTab ?? 'shelves' }}',
     selectedBook: null,
     modalOpen: false,
@@ -12,141 +12,11 @@
         this.modalOpen = true;
     }
 }">
-    <!-- SIDEBAR (FIXED ON DESKTOP) -->
-    <aside class="w-full md:w-64 lg:w-72 flex flex-col justify-between shrink-0 md:h-full md:overflow-y-auto bg-[#FAF7F2] md:bg-transparent rounded-2xl p-4 md:p-0 select-none">
-        <div>
-            <!-- Readowl Logo -->
-            <div class="flex items-center gap-3 px-2 py-4 mb-4">
-                <div class="w-10 h-10 rounded-full bg-[#E8DCB9]/60 flex items-center justify-center text-[#7A5034]">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2C8 2 4 5 4 10c0 4 2 8 8 12 6-4 8-8 8-12 0-5-4-8-8-8z"/>
-                        <circle cx="9" cy="9" r="2.5" fill="#7A5034"/>
-                        <circle cx="15" cy="9" r="2.5" fill="#7A5034"/>
-                        <path d="m12 12 1 2-2 0 1-2"/>
-                    </svg>
-                </div>
-                <div>
-                    <a href="{{ route('home') }}" class="font-serif text-2xl font-bold tracking-tight text-[#5F3D27] hover:text-[#7A5034] transition">
-                        Readowl
-                    </a>
-                </div>
-            </div>
+    <!-- Top Unified Navbar -->
+    @include('partials.navbar')
 
-            <!-- Navigation Links -->
-            <nav class="space-y-1.5">
-                <a href="{{ route('home') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
-                    <i data-lucide="home" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
-                    <span class="font-medium text-sm">Home</span>
-                </a>
-
-                <a href="{{ route('catalog') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-[#F0E6D8] border border-[#E4D5C2] text-[#4F3320] font-semibold text-sm shadow-sm transition">
-                    <i data-lucide="book-open" class="w-5 h-5 text-[#7A5034]"></i>
-                    <span>My library</span>
-                </a>
-
-                <!-- Shop (Where all books are purchased!) -->
-                <a href="{{ route('shop') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
-                    <i data-lucide="shopping-bag" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
-                    <span class="font-medium text-sm">Shop (Toko Buku)</span>
-                </a>
-
-                @auth
-                    <!-- Keranjang Belanja -->
-                    <a href="{{ route('cart.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
-                        <div class="flex items-center gap-3.5">
-                            <i data-lucide="shopping-cart" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
-                            <span class="font-medium text-sm">Keranjang</span>
-                        </div>
-                        @php
-                            $cCount = \App\Models\Cart::where('user_id', Auth::id())->count();
-                        @endphp
-                        @if($cCount > 0)
-                            <span class="px-2 py-0.5 rounded-full bg-[#7A5034] text-white text-[10px] font-bold">
-                                {{ $cCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <a href="{{ route('orders.index') }}" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
-                        <i data-lucide="receipt" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
-                        <span class="font-medium text-sm">Pesanan Saya</span>
-                    </a>
-                @endauth
-
-                <div class="pt-2 border-t border-[#E8DDCE]/50 space-y-1">
-                    <a href="{{ route('about') }}" class="flex items-center gap-3.5 px-4 py-2 rounded-xl text-[#8C7A6D] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition text-xs font-medium">
-                        <i data-lucide="info" class="w-4 h-4 text-[#9C8B7E]"></i>
-                        <span>Tentang Kami</span>
-                    </a>
-
-                    <a href="{{ route('contact') }}" class="flex items-center gap-3.5 px-4 py-2 rounded-xl text-[#8C7A6D] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition text-xs font-medium">
-                        <i data-lucide="mail" class="w-4 h-4 text-[#9C8B7E]"></i>
-                        <span>Hubungi Kami</span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-
-        <!-- Bottom Widgets -->
-        <div class="mt-8 space-y-4">
-            <!-- Continue Reading Card (Only if user has bought books) -->
-            @if($continueReadingBook)
-            <div class="bg-[#F2E8DC] border border-[#E3D6C5] rounded-2xl p-3.5 shadow-sm">
-                <div class="text-[11px] font-semibold uppercase tracking-wider text-[#8A7463] mb-2.5 flex items-center justify-between">
-                    <span>Terakhir Dibeli</span>
-                    <span class="text-[#7A5034] font-bold">Koleksi Anda</span>
-                </div>
-                <div class="flex items-center gap-3 cursor-pointer group" @click="openBook({{ json_encode($continueReadingBook) }})">
-                    <div class="w-12 h-16 shrink-0 rounded overflow-hidden shadow-sm border border-[#DACBB8]">
-                        <img src="{{ $continueReadingBook->cover_url }}" alt="{{ $continueReadingBook->title }}" class="w-full h-full object-cover group-hover:scale-105 transition">
-                    </div>
-                    <div class="overflow-hidden flex-1">
-                        <h4 class="text-xs font-bold text-[#4A3222] truncate group-hover:text-[#7A5034] transition">{{ $continueReadingBook->title }}</h4>
-                        <p class="text-[11px] text-[#8C7A6D] truncate mt-0.5">{{ $continueReadingBook->author }}</p>
-                        <span class="inline-block mt-1.5 text-[9px] uppercase px-1.5 py-0.5 rounded bg-[#E4D5C2] text-[#5F3D27] font-semibold">
-                            {{ $continueReadingBook->category }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            <!-- User Auth Profile Widget -->
-            <div class="pt-2 border-t border-[#E8DDCE]">
-                @auth
-                    <div class="flex items-center justify-between bg-[#F8F3EC] p-3 rounded-xl border border-[#E8DEC0]">
-                        <div class="flex items-center gap-2.5 overflow-hidden">
-                            <div class="w-8 h-8 rounded-full bg-[#7A5034] text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                                {{ substr(Auth::user()->name, 0, 2) }}
-                            </div>
-                            <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-[#4A3222] truncate">{{ Auth::user()->name }}</p>
-                                <p class="text-[10px] text-[#8C7A6D] truncate">Pembaca Terdaftar</p>
-                            </div>
-                        </div>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" title="Keluar" class="p-1.5 text-[#9C8B7E] hover:text-red-600 hover:bg-white rounded-lg transition">
-                                <i data-lucide="log-out" class="w-4 h-4"></i>
-                            </button>
-                        </form>
-                    </div>
-                @else
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('login') }}" class="flex-1 text-center py-2 px-3 text-xs font-medium text-[#5F3D27] bg-[#EFE4D6] hover:bg-[#E7D9C7] rounded-xl transition">
-                            Masuk
-                        </a>
-                        <a href="{{ route('register') }}" class="flex-1 text-center py-2 px-3 text-xs font-semibold text-white bg-[#7A5034] hover:bg-[#5F3D27] rounded-xl transition shadow-sm">
-                            Daftar
-                        </a>
-                    </div>
-                @endauth
-            </div>
-        </div>
-    </aside>
-
-    <!-- MAIN BOOKCASE CONTAINER (SCROLLABLE CANVAS) -->
-    <main class="flex-1 md:h-full md:overflow-y-auto bg-[#FAF7F2] border border-[#EADECF] rounded-[32px] p-5 sm:p-7 md:p-8 lg:p-10 shadow-sm flex flex-col justify-between scroll-smooth">
+    <!-- MAIN BOOKCASE CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div>
             @if(session('error'))
                 <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm rounded-2xl flex items-center gap-3 shadow-xs">
@@ -167,16 +37,19 @@
                 </div>
             @endif
 
-            <!-- Top Controls: Tabs and Search Bar -->
+            <!-- Top Controls: Header and Search Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <!-- Info Label & Quick Shop Link -->
-                <div class="flex items-center gap-2">
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-[#5F3D27]">My Library (Daftar Koleksi Buku)</h2>
-                    @auth
-                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#EFE5D7] text-[#7A5034] font-semibold">
-                            {{ $myBooks->count() }} Buku Resmi Dibeli
-                        </span>
-                    @endauth
+                <!-- Info Label -->
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#5F3D27]">My Library (Rak Koleksi Buku)</h1>
+                        @auth
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#EFE5D7] text-[#7A5034] font-semibold">
+                                {{ $myBooks->count() }} Buku Resmi Dibeli
+                            </span>
+                        @endauth
+                    </div>
+                    <p class="text-xs sm:text-sm text-[#8C7A6D] mt-1">Daftar buku fisik yang telah Anda beli dan tersusun rapi di rak 3D berdasarkan genrenya.</p>
                 </div>
 
                 <!-- Search & Shop Action -->
@@ -192,7 +65,7 @@
 
                     <a href="{{ route('shop') }}" class="px-4 py-2 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span>Beli Buku di Shop</span>
+                        <span>Beli Buku Baru</span>
                     </a>
                 </div>
             </div>
@@ -203,10 +76,10 @@
                 @if($genresWithBooks->count() > 0)
                     <!-- TAMPILAN RAK PER GENRE BUKU YANG SUDAH DIBELI -->
                     @foreach($genresWithBooks as $genre => $books)
-                        <section class="shelf-container">
+                        <section class="shelf-container bg-white/60 border border-[#EBE1D3] rounded-3xl p-6 sm:p-8 shadow-xs">
                             <div class="flex items-center justify-between mb-4 px-1">
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#B0825B]"></span>
+                                    <span class="w-3 h-3 rounded-full bg-[#B0825B]"></span>
                                     <h3 class="font-serif text-lg md:text-xl font-bold text-[#5F3D27] tracking-tight">
                                         Genre: {{ $genre }}
                                     </h3>
@@ -215,17 +88,17 @@
                             </div>
 
                             <!-- Books On Genre Shelf -->
-                            <div class="relative pt-4 pb-0 px-4 md:px-8 flex items-end gap-6 sm:gap-8 md:gap-12 overflow-x-auto min-h-[190px]">
+                            <div class="relative pt-6 pb-0 px-4 md:px-8 flex items-end gap-6 sm:gap-8 md:gap-12 overflow-x-auto min-h-[210px]">
                                 @foreach($books as $book)
-                                    <div class="book-wrapper cursor-pointer shrink-0" @click="openBook({{ json_encode($book) }})">
-                                        <div class="w-24 sm:w-28 md:w-32 aspect-[2/3] book-cover bg-[#E9DECD]">
+                                    <div class="book-wrapper cursor-pointer shrink-0 group" @click="openBook({{ json_encode($book) }})">
+                                        <div class="w-24 sm:w-28 md:w-32 aspect-[2/3] book-cover bg-[#E9DECD] shadow-md group-hover:shadow-xl transition duration-300">
                                             <img src="{{ $book->cover_url }}" 
                                                  alt="{{ $book->title }}" 
                                                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
                                                  class="w-full h-full object-cover">
                                         </div>
-                                        <div class="text-center mt-2 w-24 sm:w-28 md:w-32">
-                                            <p class="text-[11px] font-semibold text-[#4A3222] truncate">{{ $book->title }}</p>
+                                        <div class="text-center mt-2.5 w-24 sm:w-28 md:w-32">
+                                            <p class="text-[11px] font-semibold text-[#4A3222] truncate group-hover:text-[#7A5034] transition">{{ $book->title }}</p>
                                             <p class="text-[9px] text-[#8C7A6D] truncate">{{ $book->author }}</p>
                                         </div>
                                     </div>
@@ -233,13 +106,13 @@
                             </div>
 
                             <!-- 3D Shelf Ledge -->
-                            <div class="shelf-surface mt-1"></div>
+                            <div class="shelf-surface mt-2"></div>
                             <div class="shelf-face"></div>
                         </section>
                     @endforeach
                 @else
                     <!-- EMPTY STATE: RAK AWAL KOSONG SEBELUM MEMBELI BUKU -->
-                    <div class="py-10 text-center max-w-xl mx-auto space-y-6">
+                    <div class="py-12 text-center max-w-xl mx-auto space-y-6">
                         
                         <!-- Empty Shelf Graphic -->
                         <div class="shelf-container px-4">
@@ -250,7 +123,7 @@
                             <div class="shelf-face"></div>
                         </div>
 
-                        <div class="bg-[#FAF7F2] border border-[#E7DCCE] rounded-3xl p-8 shadow-xs">
+                        <div class="bg-white border border-[#E7DCCE] rounded-3xl p-8 sm:p-10 shadow-xs">
                             <div class="w-14 h-14 rounded-full bg-[#EFE5D7] text-[#7A5034] mx-auto flex items-center justify-center mb-4">
                                 <i data-lucide="book-marked" class="w-7 h-7"></i>
                             </div>

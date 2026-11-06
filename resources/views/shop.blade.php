@@ -15,65 +15,7 @@
 }">
 
     <!-- TOP HEADER -->
-    <header class="border-b border-[#EFE5D7] bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('home') }}" class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-full bg-[#EFE4D6] flex items-center justify-center text-[#7A5034]">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    </div>
-                    <span class="font-serif text-2xl font-bold tracking-tight text-[#5F3D27]">Readowl Shop</span>
-                </a>
-            </div>
-
-            <!-- Nav Links -->
-            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-[#7A6B60]">
-                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] transition">Beranda</a>
-                <a href="{{ route('shop') }}" class="font-bold text-[#7A5034]">Toko Buku</a>
-                <a href="{{ route('catalog') }}" class="hover:text-[#5F3D27] transition flex items-center gap-1.5 font-semibold text-[#7A5034]">
-                    <i data-lucide="book-open" class="w-4 h-4"></i>
-                    <span>Rak 3D</span>
-                </a>
-                <a href="{{ route('about') }}" class="hover:text-[#5F3D27] transition">Tentang Kami</a>
-                <a href="{{ route('contact') }}" class="hover:text-[#5F3D27] transition">Kontak</a>
-                @auth
-                    <a href="{{ route('orders.index') }}" class="hover:text-[#5F3D27] transition">Pesanan Saya</a>
-                @endauth
-            </nav>
-
-            <!-- User Auth & Cart -->
-            <div class="flex items-center gap-3">
-                @auth
-                    <!-- Cart Button with Counter -->
-                    <a href="{{ route('cart.index') }}" class="relative p-2 text-[#7A5034] hover:bg-[#EFE4D6] rounded-xl transition" title="Keranjang Belanja">
-                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                        @php
-                            $cartCount = \App\Models\Cart::where('user_id', Auth::id())->count();
-                        @endphp
-                        @if($cartCount > 0)
-                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-[#7A5034] text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
-                                {{ $cartCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <div class="flex items-center gap-2 text-xs">
-                        <span class="text-[#8C7A6D]">Halo,</span>
-                        <span class="font-bold text-[#4A3222]">{{ Auth::user()->name }}</span>
-                    </div>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="p-2 text-[#9C8B7E] hover:text-red-600 transition" title="Keluar">
-                            <i data-lucide="log-out" class="w-4 h-4"></i>
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 text-xs font-semibold text-[#5F3D27] hover:underline">Masuk</a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 bg-[#7A5034] text-white text-xs font-semibold rounded-xl hover:bg-[#5F3D27] transition">Daftar</a>
-                @endauth
-            </div>
-        </div>
-    </header>
+    @include('partials.navbar')
 
     <!-- MAIN STORE SECTION -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

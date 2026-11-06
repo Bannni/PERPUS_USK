@@ -6,52 +6,7 @@
 <div class="min-h-screen bg-[#FAF7F2] text-[#2D231E]">
 
     <!-- TOP HEADER -->
-    <header class="border-b border-[#EFE5D7] bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('home') }}" class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-full bg-[#EFE4D6] flex items-center justify-center text-[#7A5034]">
-                        <i data-lucide="book-open" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="font-serif text-2xl font-bold tracking-tight text-[#5F3D27] block leading-none">Readowl</span>
-                        <span class="text-[9px] uppercase tracking-widest text-[#9C8B7E]">Bookstore & Library</span>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Nav Links -->
-            <nav class="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-[#7A6B60]">
-                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] transition">Beranda</a>
-                <a href="{{ route('shop') }}" class="hover:text-[#5F3D27] transition">Toko Buku</a>
-                <a href="{{ route('catalog') }}" class="hover:text-[#5F3D27] transition">Rak 3D</a>
-                <a href="{{ route('about') }}" class="font-bold text-[#7A5034]">Tentang Kami</a>
-                <a href="{{ route('contact') }}" class="hover:text-[#5F3D27] transition">Hubungi Kami</a>
-            </nav>
-
-            <!-- Actions / Auth -->
-            <div class="flex items-center gap-3">
-                @auth
-                    <a href="{{ route('cart.index') }}" class="relative p-2 text-[#7A5034] hover:bg-[#EFE4D6] rounded-xl transition" title="Keranjang Belanja">
-                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                        @php
-                            $cartCount = \App\Models\Cart::where('user_id', Auth::id())->count();
-                        @endphp
-                        @if($cartCount > 0)
-                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-[#7A5034] text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
-                                {{ $cartCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <a href="{{ route('orders.index') }}" class="text-xs font-semibold text-[#5F3D27] hover:underline hidden sm:inline">Pesanan Saya</a>
-                @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 text-xs font-semibold text-[#5F3D27] hover:underline">Masuk</a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 bg-[#7A5034] text-white text-xs font-semibold rounded-xl hover:bg-[#5F3D27] transition">Daftar</a>
-                @endauth
-            </div>
-        </div>
-    </header>
+    @include('partials.navbar')
 
     <!-- HERO PROFILE SECTION -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">

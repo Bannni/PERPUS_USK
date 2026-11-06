@@ -3,7 +3,7 @@
 @section('title', 'Riwayat Pembelian & Bukti Transaksi - Readowl Bookstore')
 
 @section('content')
-<div class="min-h-screen bg-[#F6F4EE] flex flex-col justify-between p-4 sm:p-8 lg:p-12"
+<div class="min-h-screen bg-[#FAF7F2] text-[#2D231E]"
      x-data="{
         invoiceModal: false,
         activeOrder: null,
@@ -13,32 +13,11 @@
         }
      }">
     
-    <!-- Top Navigation Bar -->
-    <header class="max-w-7xl mx-auto w-full flex items-center justify-between pb-6 border-b border-[#E8E1D5]">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('catalog') }}" class="w-10 h-10 rounded-full bg-[#EFE7DC] flex items-center justify-center text-[#7A5034] hover:bg-[#E2D5C4] transition">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            </a>
-            <div>
-                <a href="{{ route('home') }}" class="font-serif text-2xl font-bold tracking-tight text-[#1C1815]">Readowl</a>
-                <span class="text-xs text-[#8C8075] block">Koleksi Pribadi & Pembelian</span>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-            <a href="{{ route('shop') }}" class="px-4 py-2 bg-[#EFE5D7] text-[#5F3D27] text-xs sm:text-sm font-semibold rounded-xl hover:bg-[#E2D5C4] transition flex items-center gap-1.5">
-                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                <span>Toko Buku (Shop)</span>
-            </a>
-            <a href="{{ route('catalog') }}" class="px-4 py-2 bg-[#1C1815] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-black transition flex items-center gap-2">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span>Rak Buku 3D</span>
-            </a>
-        </div>
-    </header>
+    <!-- Top Unified Navbar -->
+    @include('partials.navbar')
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto w-full py-8 flex-1">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         <!-- Alerts -->
         @if(session('error'))
