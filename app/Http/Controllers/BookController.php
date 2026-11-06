@@ -36,12 +36,19 @@ class BookController extends Controller
             $myBooks = collect();
             $continueReadingBook = null;
         } else {
-            $purchasedBookIds = Order::where('user_id', Auth::id())
-                ->where('status', 'completed')
-                ->pluck('book_id')
-                ->unique();
+            $userId = Auth::id();
+            $fromOrders = Order::where('user_id', $userId)
+                ->whereIn('status', ['completed', 'processing', 'pending'])
+                ->pluck('book_id');
 
-            $query = Book::whereIn('id', $purchasedBookIds);
+            $fromItems = \App\Models\OrderItem::whereHas('order', function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->whereIn('status', ['completed', 'processing', 'pending']);
+            })->pluck('book_id');
+
+            $purchasedBookIds = $fromOrders->merge($fromItems)->unique();
+
+            $query = Book::with('stock')->whereIn('id', $purchasedBookIds);
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -78,13 +85,15 @@ class BookController extends Controller
         $search = $request->input('q');
         $selectedCategory = $request->input('category');
 
-        $query = Book::query();
+        $query = Book::with('stock');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('synopsis', 'like', "%{$search}%");
+                  ->orWhere('publisher', 'like', "%{$search}%")
+                  ->orWhere('synopsis', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -96,9 +105,16 @@ class BookController extends Controller
         $categories = Book::select('category')->distinct()->pluck('category');
 
         // Check which books the logged-in user already purchased
-        $userPurchasedIds = Auth::check()
-            ? Order::where('user_id', Auth::id())->where('status', 'completed')->pluck('book_id')->toArray()
-            : [];
+        if (Auth::check()) {
+            $uId = Auth::id();
+            $oIds = Order::where('user_id', $uId)->whereIn('status', ['completed', 'processing'])->pluck('book_id');
+            $iIds = \App\Models\OrderItem::whereHas('order', function ($q) use ($uId) {
+                $q->where('user_id', $uId)->whereIn('status', ['completed', 'processing']);
+            })->pluck('book_id');
+            $userPurchasedIds = $oIds->merge($iIds)->unique()->toArray();
+        } else {
+            $userPurchasedIds = [];
+        }
 
         return view('shop', compact('books', 'categories', 'selectedCategory', 'search', 'userPurchasedIds'));
     }

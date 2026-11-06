@@ -24,11 +24,23 @@
                 </div>
 
                 <!-- Right Nav Links -->
-                <div class="flex items-center gap-5 sm:gap-7">
-                    <a href="{{ route('shop') }}" class="hover:text-[#1C1815] transition font-semibold text-[#7A5034]">Shop (Toko Buku)</a>
-                    <a href="{{ route('catalog') }}" class="hover:text-[#1C1815] transition hidden md:inline">My Library (Rak 3D)</a>
-                    <a href="#featured" class="hover:text-[#1C1815] transition hidden md:inline">Featured</a>
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <a href="{{ route('shop') }}" class="hover:text-[#1C1815] transition font-semibold text-[#7A5034]">Toko Buku</a>
+                    <a href="{{ route('about') }}" class="hover:text-[#1C1815] transition hidden md:inline">Tentang Kami</a>
+                    <a href="{{ route('contact') }}" class="hover:text-[#1C1815] transition hidden md:inline">Kontak</a>
                     @auth
+                        <a href="{{ route('cart.index') }}" class="relative p-1.5 text-[#7A5034] hover:bg-[#E2DDD3] rounded-full transition" title="Keranjang Belanja">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                            @php
+                                $cCount = \App\Models\Cart::where('user_id', Auth::id())->count();
+                            @endphp
+                            @if($cCount > 0)
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-[#7A5034] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
+                                    {{ $cCount }}
+                                </span>
+                            @endif
+                        </a>
+
                         @if(Auth::user()->isAdmin())
                             <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-1.5 bg-amber-600 text-white rounded-full text-xs font-semibold hover:bg-amber-700 transition flex items-center gap-1.5 shadow-sm">
                                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
@@ -282,6 +294,8 @@
             <p>© 2026 Readowl Bookstore • Dirancang untuk Pengalaman Membaca Terbaik</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('shop') }}" class="hover:text-white transition">Toko Buku</a>
+                <a href="{{ route('about') }}" class="hover:text-white transition">Tentang Kami</a>
+                <a href="{{ route('contact') }}" class="hover:text-white transition">Kontak</a>
                 <a href="{{ route('catalog') }}" class="hover:text-white transition">Katalog</a>
                 <a href="{{ route('login') }}" class="hover:text-white transition">Masuk</a>
                 <a href="{{ route('register') }}" class="hover:text-white transition">Daftar</a>

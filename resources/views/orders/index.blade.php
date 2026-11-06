@@ -105,14 +105,34 @@
                         <!-- Order Info -->
                         <div class="flex-1 overflow-hidden space-y-1">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-mono text-[#8C8075] uppercase">{{ $order->order_number }}</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                    {{ ucfirst($order->status) }}
-                                </span>
+                                <span class="text-[10px] font-mono text-[#8C8075] uppercase">{{ $order->order_code ?? $order->order_number }}</span>
+                                @if($order->status === 'completed')
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                        Completed (Selesai)
+                                    </span>
+                                @elseif($order->status === 'processing')
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800">
+                                        Processing (Dikirim)
+                                    </span>
+                                @elseif($order->status === 'pending')
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                                        Pending (Menunggu)
+                                    </span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">
+                                        Cancelled
+                                    </span>
+                                @endif
                             </div>
 
-                            <h3 class="font-serif font-bold text-base text-[#1C1815] truncate">{{ $order->book->title }}</h3>
-                            <p class="text-xs text-[#7A6E63] truncate">{{ $order->book->author }}</p>
+                            <h3 class="font-serif font-bold text-base text-[#1C1815] truncate">{{ $order->book->title ?? 'Pesanan Buku' }}</h3>
+                            <p class="text-xs text-[#7A6E63] truncate">{{ $order->book->author ?? 'Readowl' }}</p>
+
+                            @if($order->shipping_address)
+                                <div class="text-[10px] text-[#8C8075] truncate mt-1">
+                                    <i data-lucide="map-pin" class="w-3 h-3 inline mr-1 text-[#7A5034]"></i>{{ $order->shipping_address }}
+                                </div>
+                            @endif
 
                             <div class="pt-2 text-xs text-[#5C534B] flex items-center justify-between">
                                 <div>

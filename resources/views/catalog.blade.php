@@ -60,6 +60,22 @@
                 </a>
 
                 @auth
+                    <!-- Keranjang Belanja -->
+                    <a href="{{ route('cart.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
+                        <div class="flex items-center gap-3.5">
+                            <i data-lucide="shopping-cart" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
+                            <span class="font-medium text-sm">Keranjang</span>
+                        </div>
+                        @php
+                            $cCount = \App\Models\Cart::where('user_id', Auth::id())->count();
+                        @endphp
+                        @if($cCount > 0)
+                            <span class="px-2 py-0.5 rounded-full bg-[#7A5034] text-white text-[10px] font-bold">
+                                {{ $cCount }}
+                            </span>
+                        @endif
+                    </a>
+
                     <a href="{{ route('orders.index') }}" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[#7A6B60] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition group">
                         <i data-lucide="receipt" class="w-5 h-5 text-[#9C8B7E] group-hover:text-[#7A5034] transition"></i>
                         <span class="font-medium text-sm">Pesanan Saya</span>
@@ -74,6 +90,18 @@
                         </div>
                     @endif
                 @endauth
+
+                <div class="pt-2 border-t border-[#E8DDCE]/50 space-y-1">
+                    <a href="{{ route('about') }}" class="flex items-center gap-3.5 px-4 py-2 rounded-xl text-[#8C7A6D] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition text-xs font-medium">
+                        <i data-lucide="info" class="w-4 h-4 text-[#9C8B7E]"></i>
+                        <span>Tentang Kami</span>
+                    </a>
+
+                    <a href="{{ route('contact') }}" class="flex items-center gap-3.5 px-4 py-2 rounded-xl text-[#8C7A6D] hover:text-[#4A3222] hover:bg-[#EFE5D7]/50 transition text-xs font-medium">
+                        <i data-lucide="mail" class="w-4 h-4 text-[#9C8B7E]"></i>
+                        <span>Hubungi Kami</span>
+                    </a>
+                </div>
             </nav>
         </div>
 

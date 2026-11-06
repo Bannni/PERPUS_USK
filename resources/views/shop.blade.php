@@ -28,24 +28,40 @@
 
             <!-- Nav Links -->
             <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-[#7A6B60]">
-                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] transition">Home</a>
+                <a href="{{ route('home') }}" class="hover:text-[#5F3D27] transition">Beranda</a>
+                <a href="{{ route('shop') }}" class="font-bold text-[#7A5034]">Toko Buku</a>
                 <a href="{{ route('catalog') }}" class="hover:text-[#5F3D27] transition flex items-center gap-1.5 font-semibold text-[#7A5034]">
                     <i data-lucide="book-open" class="w-4 h-4"></i>
-                    <span>My Library (Rak 3D)</span>
+                    <span>Rak 3D</span>
                 </a>
+                <a href="{{ route('about') }}" class="hover:text-[#5F3D27] transition">Tentang Kami</a>
+                <a href="{{ route('contact') }}" class="hover:text-[#5F3D27] transition">Kontak</a>
                 @auth
                     <a href="{{ route('orders.index') }}" class="hover:text-[#5F3D27] transition">Pesanan Saya</a>
                     @if(Auth::user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-1.5 bg-[#1C1815] text-amber-300 rounded-xl text-xs font-semibold hover:bg-black transition">
-                            Panel Admin
+                        <a href="{{ route('admin.dashboard') }}" class="px-3 py-1 bg-[#1C1815] text-amber-300 rounded-xl text-xs font-semibold hover:bg-black transition">
+                            Admin
                         </a>
                     @endif
                 @endauth
             </nav>
 
-            <!-- User Auth -->
+            <!-- User Auth & Cart -->
             <div class="flex items-center gap-3">
                 @auth
+                    <!-- Cart Button with Counter -->
+                    <a href="{{ route('cart.index') }}" class="relative p-2 text-[#7A5034] hover:bg-[#EFE4D6] rounded-xl transition" title="Keranjang Belanja">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        @php
+                            $cartCount = \App\Models\Cart::where('user_id', Auth::id())->count();
+                        @endphp
+                        @if($cartCount > 0)
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-[#7A5034] text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </a>
+
                     <div class="flex items-center gap-2 text-xs">
                         <span class="text-[#8C7A6D]">Halo,</span>
                         <span class="font-bold text-[#4A3222]">{{ Auth::user()->name }}</span>
@@ -160,11 +176,28 @@
                                 {{ $book->title }}
                             </h3>
                             <p class="text-[11px] text-[#8C7A6D] line-clamp-1">{{ $book->author }}</p>
+
+                            <!-- Stock & Publisher -->
+                            @php
+                                $stock = $book->stock ? $book->stock->quantity : 0;
+                            @endphp
+                            <div class="flex items-center justify-between text-[10px] mt-1.5 pt-1.5 border-t border-dashed border-[#F2EAE0]">
+                                <span class="text-[#8C7A6D] truncate max-w-[100px]">{{ $book->publisher ?? 'Readowl' }}</span>
+                                @if($stock > 0)
+                                    <span class="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[9px]">
+                                        Stok: {{ $stock }}
+                                    </span>
+                                @else
+                                    <span class="text-red-600 font-semibold bg-red-50 px-1.5 py-0.5 rounded text-[9px]">
+                                        Habis
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Price & Buy Button -->
-                    <div class="mt-4 pt-3 border-t border-[#F2EAE0]">
+                    <!-- Price & Buy / Cart Button -->
+                    <div class="mt-3 pt-2.5 border-t border-[#F2EAE0]">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-[10px] text-[#9C8B7E]">Harga:</span>
                             <span class="text-xs sm:text-sm font-bold text-[#7A5034]">
@@ -176,12 +209,25 @@
                             <a href="{{ route('catalog') }}" class="w-full py-2 bg-[#EFE5D7] text-[#5F3D27] text-xs font-semibold rounded-xl text-center block hover:bg-[#E5D7C5] transition">
                                 Buka di Rak 3D
                             </a>
+                        @elseif($stock > 0)
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <form action="{{ route('cart.store') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <button type="submit" class="w-full py-2 bg-[#FAF7F2] hover:bg-[#EFE5D7] text-[#5F3D27] text-xs font-semibold rounded-xl border border-[#DACAB6] transition flex items-center justify-center gap-1" title="Tambah ke Keranjang">
+                                        <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                                        <span>+ Cart</span>
+                                    </button>
+                                </form>
+                                <button type="button" 
+                                        @click="openBuy({{ json_encode($book) }})" 
+                                        class="w-full py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center justify-center gap-1">
+                                    <span>Beli</span>
+                                </button>
+                            </div>
                         @else
-                            <button type="button" 
-                                    @click="openBuy({{ json_encode($book) }})" 
-                                    class="w-full py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
-                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5 text-amber-300"></i>
-                                <span>Beli Buku</span>
+                            <button disabled class="w-full py-2 bg-slate-100 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed">
+                                Stok Habis
                             </button>
                         @endif
                     </div>

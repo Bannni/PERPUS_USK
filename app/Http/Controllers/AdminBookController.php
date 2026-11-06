@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
+use App\Models\Contact;
 use App\Models\Order;
+use App\Models\Stock;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 class AdminBookController extends Controller
 {
     /**
-     * Display a unified admin dashboard (Book CRUD, User Monitoring, Order Logs).
+     * Display a unified admin dashboard (Book CRUD, User Monitoring, Order Logs, Category CRUD, Stock, Contacts).
      */
     public function index(Request $request)
     {
@@ -19,27 +22,30 @@ class AdminBookController extends Controller
         $search = $request->input('q');
         $category = $request->input('category');
 
-        // 1. Books query
-        $bookQuery = Book::query();
+        // 1. Books query with stocks and categories
+        $bookQuery = Book::with(['stock', 'categoryRelation']);
         if ($search && $activeTab === 'books') {
             $bookQuery->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('author', 'like', "%{$search}%")
+                  ->orWhere('publisher', 'like', "%{$search}%")
                   ->orWhere('category', 'like', "%{$search}%");
             });
         }
         if ($category) {
-            $bookQuery->where('category', $category);
+            $bookQuery->where(function ($q) use ($category) {
+                $q->where('category', $category)
+                  ->orWhereHas('categoryRelation', function ($sub) use ($category) {
+                      $sub->where('name', $category)->orWhere('slug', $category);
+                  });
+            });
         }
         $books = $bookQuery->latest()->paginate(9, ['*'], 'books_page')->withQueryString();
-        $categories = Book::select('category')->distinct()->pluck('category');
+        $categories = Category::withCount('books')->get();
 
         // 2. Users query
-        $userQuery = User::withCount(['orders' => function ($q) {
-            $q->where('status', 'completed');
-        }])->withSum(['orders' => function ($q) {
-            $q->where('status', 'completed');
-        }], 'total_price');
+        $userQuery = User::withCount(['orders'])
+            ->withSum('orders', 'total_price');
 
         if ($search && $activeTab === 'users') {
             $userQuery->where(function ($q) use ($search) {
@@ -51,15 +57,20 @@ class AdminBookController extends Controller
         $users = $userQuery->latest()->paginate(10, ['*'], 'users_page')->withQueryString();
 
         // 3. Orders query
-        $orders = Order::with(['user', 'book'])->latest()->paginate(15, ['*'], 'orders_page')->withQueryString();
+        $orders = Order::with(['user', 'book', 'items.book'])->latest()->paginate(15, ['*'], 'orders_page')->withQueryString();
+
+        // 4. Contacts query (BNSP Requirement)
+        $contacts = Contact::with('user')->latest()->paginate(10, ['*'], 'contacts_page')->withQueryString();
+        $unreadContacts = Contact::where('is_read', false)->count();
 
         // Summary Statistics
         $totalBooks = Book::count();
         $totalOrders = Order::count();
-        $totalRevenue = Order::where('status', 'completed')->sum('total_price');
+        $totalRevenue = Order::whereIn('status', ['completed', 'processing'])->sum('total_price');
         $totalUsers = User::count();
         $totalMembers = User::where('role', 'user')->count();
         $totalAdmins = User::where('role', 'admin')->count();
+        $totalStockQty = Stock::sum('quantity');
 
         return view('admin.dashboard', compact(
             'activeTab',
@@ -67,15 +78,40 @@ class AdminBookController extends Controller
             'categories',
             'users',
             'orders',
+            'contacts',
+            'unreadContacts',
             'totalBooks',
             'totalOrders',
             'totalRevenue',
             'totalUsers',
             'totalMembers',
             'totalAdmins',
+            'totalStockQty',
             'search',
             'category'
         ));
+    }
+
+    /**
+     * Mark a contact message as read / toggle status.
+     */
+    public function markContactAsRead($id)
+    {
+        $contact = Contact::findOrFail($id);
+        $contact->update(['is_read' => true]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'contacts'])->with('success', 'Pesan telah ditandai sebagai sudah dibaca.');
+    }
+
+    /**
+     * Delete contact message.
+     */
+    public function destroyContact($id)
+    {
+        $contact = Contact::findOrFail($id);
+        $contact->delete();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'contacts'])->with('success', 'Pesan kontak berhasil dihapus.');
     }
 
     /**
