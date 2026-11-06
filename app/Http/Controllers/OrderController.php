@@ -50,24 +50,26 @@ class OrderController extends Controller
             return redirect()->route('cart.index')->with('error', 'Keranjang belanja Anda masih kosong!');
         }
 
-        // Validate stock availability for all items before placing order
-        foreach ($cartItems as $item) {
-            $stock = $item->book->stock ? $item->book->stock->quantity : 0;
-            if ($item->quantity > $stock) {
-                return redirect()->route('cart.index')->with('error', "Stok untuk buku '{$item->book->title}' tidak mencukupi (Tersisa: {$stock})!");
-            }
-        }
-
         DB::beginTransaction();
 
         try {
+            // Validate stock availability with lockForUpdate before placing order
+            foreach ($cartItems as $item) {
+                $stock = Stock::where('book_id', $item->book_id)->lockForUpdate()->first();
+                $avail = $stock ? $stock->quantity : 0;
+                if ($item->quantity > $avail) {
+                    DB::rollBack();
+                    return redirect()->route('cart.index')->with('error', "Stok untuk buku '{$item->book->title}' tidak mencukupi (Tersisa: {$avail})!");
+                }
+            }
+
             $totalPrice = $cartItems->sum(function ($item) {
                 return $item->book->price * $item->quantity;
             });
 
             $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
 
-            // Create Order header
+            // Create Order header (Initial status: pending, stock_deducted: false)
             $order = Order::create([
                 'order_code' => $orderCode,
                 'order_number' => $orderCode,
@@ -77,11 +79,12 @@ class OrderController extends Controller
                 'total_price' => $totalPrice,
                 'payment_method' => $validated['payment_method'],
                 'status' => 'pending', // Initial status as required by BNSP PRD
+                'stock_deducted' => false, // Stock only decrements when order is ACC'd by Admin
                 'shipping_address' => $validated['shipping_address'],
                 'buyer_notes' => $validated['buyer_notes'] ?? null,
             ]);
 
-            // Create order_items and decrement stock
+            // Create order_items (stock will be decremented upon Admin ACC)
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -89,11 +92,6 @@ class OrderController extends Controller
                     'quantity' => $item->quantity,
                     'price' => $item->book->price,
                 ]);
-
-                // Reduce stock in stocks table
-                if ($item->book->stock) {
-                    $item->book->stock->decrement('quantity', $item->quantity);
-                }
             }
 
             // Empty the user's cart
@@ -101,7 +99,7 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('orders.index')->with('success', "Pesanan #{$order->order_code} berhasil dibuat dengan metode {$order->payment_method}! Kuantitas stok otomatis diperbarui.");
+            return redirect()->route('orders.index')->with('success', "Pesanan #{$order->order_code} berhasil dibuat! Menunggu persetujuan (ACC) dari Admin.");
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('cart.index')->with('error', 'Terjadi kesalahan saat memproses checkout: ' . $e->getMessage());
@@ -124,17 +122,19 @@ class OrderController extends Controller
         $book = Book::with('stock')->findOrFail($validated['book_id']);
         $quantity = $validated['quantity'] ?? 1;
 
-        $currentStock = $book->stock ? $book->stock->quantity : 0;
-        if ($quantity > $currentStock) {
-            return back()->with('error', "Stok buku '{$book->title}' tidak mencukupi (Tersisa: {$currentStock})!");
-        }
-
-        $totalPrice = $book->price * $quantity;
-        $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
-
         DB::beginTransaction();
 
         try {
+            $stock = Stock::where('book_id', $book->id)->lockForUpdate()->first();
+            $currentStock = $stock ? $stock->quantity : 0;
+            if ($quantity > $currentStock) {
+                DB::rollBack();
+                return back()->with('error', "Stok buku '{$book->title}' tidak mencukupi (Tersisa: {$currentStock})!");
+            }
+
+            $totalPrice = $book->price * $quantity;
+            $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+
             $order = Order::create([
                 'order_code' => $orderCode,
                 'order_number' => $orderCode,
@@ -144,6 +144,7 @@ class OrderController extends Controller
                 'total_price' => $totalPrice,
                 'payment_method' => $validated['payment_method'] ?? 'Payment at Delivery (COD)',
                 'status' => 'pending',
+                'stock_deducted' => false,
                 'shipping_address' => $validated['shipping_address'] ?? 'Pengiriman standar ke alamat terdaftar',
                 'buyer_notes' => $validated['buyer_notes'] ?? null,
             ]);
@@ -155,13 +156,9 @@ class OrderController extends Controller
                 'price' => $book->price,
             ]);
 
-            if ($book->stock) {
-                $book->stock->decrement('quantity', $quantity);
-            }
-
             DB::commit();
 
-            return redirect()->route('orders.index')->with('success', "Pembelian buku '{$book->title}' berhasil! Pesanan #{$order->order_code} tercatat dan stok berkurang.");
+            return redirect()->route('orders.index')->with('success', "Pembelian buku '{$book->title}' berhasil diajukan! Pesanan #{$order->order_code} menunggu persetujuan (ACC) Admin.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal memproses transaksi: ' . $e->getMessage());

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity')->default(1);
             $table->integer('total_price');
-            $table->string('payment_method')->default('Transfer Bank / QRIS');
-            $table->enum('status', ['completed', 'pending', 'cancelled'])->default('completed');
+            $table->string('payment_method')->default('Payment at Delivery (COD)');
+            $table->string('status', 50)->default('pending');
             $table->text('buyer_notes')->nullable();
             $table->timestamps();
         });

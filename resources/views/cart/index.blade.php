@@ -108,27 +108,39 @@
                                 <!-- Quantity Controls & Delete -->
                                 <div class="flex items-center justify-between w-full sm:w-auto gap-4 pt-2 sm:pt-0">
                                     <!-- Quantity Update Form -->
-                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center border border-[#DACBB8] rounded-xl overflow-hidden bg-[#FAF7F2]">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" 
-                                                name="quantity" 
-                                                value="{{ max(1, $item->quantity - 1) }}" 
-                                                class="px-2.5 py-1 text-xs text-[#5F3D27] hover:bg-[#EFE4D6] transition font-bold"
-                                                {{ $item->quantity <= 1 ? 'disabled' : '' }}>
-                                            -
-                                        </button>
-                                        <span class="px-3 py-1 text-xs font-bold text-[#4A3222] border-x border-[#DACBB8] bg-white">
-                                            {{ $item->quantity }}
-                                        </span>
-                                        <button type="submit" 
-                                                name="quantity" 
-                                                value="{{ $item->quantity + 1 }}" 
-                                                class="px-2.5 py-1 text-xs text-[#5F3D27] hover:bg-[#EFE4D6] transition font-bold"
-                                                {{ ($item->book->stock && $item->quantity >= $item->book->stock->quantity) ? 'disabled' : '' }}>
-                                            +
-                                        </button>
-                                    </form>
+                                    @php
+                                        $availStock = $item->book->stock ? $item->book->stock->quantity : 0;
+                                        $isMaxStock = $item->quantity >= $availStock;
+                                    @endphp
+                                    <div class="flex flex-col items-center sm:items-end gap-1">
+                                        <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center border border-[#DACBB8] rounded-xl overflow-hidden bg-[#FAF7F2]">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" 
+                                                    name="quantity" 
+                                                    value="{{ max(1, $item->quantity - 1) }}" 
+                                                    class="px-2.5 py-1 text-xs text-[#5F3D27] hover:bg-[#EFE4D6] transition font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    {{ $item->quantity <= 1 ? 'disabled' : '' }}>
+                                                -
+                                            </button>
+                                            <span class="px-3 py-1 text-xs font-bold text-[#4A3222] border-x border-[#DACBB8] bg-white min-w-[2rem] text-center">
+                                                {{ $item->quantity }}
+                                            </span>
+                                            <button type="submit" 
+                                                    name="quantity" 
+                                                    value="{{ $item->quantity + 1 }}" 
+                                                    class="px-2.5 py-1 text-xs text-[#5F3D27] hover:bg-[#EFE4D6] transition font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    {{ $isMaxStock ? 'disabled' : '' }}
+                                                    title="{{ $isMaxStock ? 'Batas stok tercapai' : 'Tambah kuantitas' }}">
+                                                +
+                                            </button>
+                                        </form>
+                                        @if($isMaxStock)
+                                            <span class="text-[9px] font-bold text-amber-800 bg-amber-100/90 border border-amber-300 px-1.5 py-0.2 rounded-md">
+                                                Maksimal stok ({{ $availStock }})
+                                            </span>
+                                        @endif
+                                    </div>
 
                                     <!-- Item Subtotal -->
                                     <div class="text-right min-w-[90px]">

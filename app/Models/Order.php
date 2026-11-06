@@ -20,8 +20,13 @@ class Order extends Model
         'total_price',
         'payment_method',
         'status',
+        'stock_deducted',
         'shipping_address',
         'buyer_notes',
+    ];
+
+    protected $casts = [
+        'stock_deducted' => 'boolean',
     ];
 
     public function user(): BelongsTo

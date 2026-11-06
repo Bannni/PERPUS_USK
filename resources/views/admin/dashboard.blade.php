@@ -199,35 +199,70 @@
         <section x-show="activeTab === 'books'">
             
             <!-- Filter & Search Bar for Books -->
-            <div class="bg-[#1D1A16] border border-[#332C24] rounded-2xl p-4 sm:p-5 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="bg-[#1D1A16] border border-[#332C24] rounded-2xl p-4 sm:p-5 mb-8 space-y-4">
                 
-                <!-- Category Filter Pills -->
-                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <a href="{{ route('admin.dashboard', ['tab' => 'books']) }}" 
-                       class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ empty($category) ? 'bg-amber-400 text-[#151311] shadow-xs' : 'text-[#A69785] bg-[#26211B] hover:bg-[#332C24]' }}">
-                        Semua Kategori
-                    </a>
-                    @foreach($categories as $cat)
-                        <a href="{{ route('admin.dashboard', ['tab' => 'books', 'category' => $cat->name, 'q' => request('q')]) }}" 
-                           class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ $category === $cat->name ? 'bg-amber-400 text-[#151311] shadow-xs' : 'text-[#A69785] bg-[#26211B] hover:bg-[#332C24]' }}">
-                            {{ $cat->name }} ({{ $cat->books_count }})
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <!-- Category Filter Pills -->
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <a href="{{ route('admin.dashboard', ['tab' => 'books', 'stock_filter' => $stockFilter]) }}" 
+                           class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ empty($category) ? 'bg-amber-400 text-[#151311] shadow-xs' : 'text-[#A69785] bg-[#26211B] hover:bg-[#332C24]' }}">
+                            Semua Kategori
                         </a>
-                    @endforeach
+                        @foreach($categories as $cat)
+                            <a href="{{ route('admin.dashboard', ['tab' => 'books', 'category' => $cat->name, 'stock_filter' => $stockFilter, 'q' => request('q')]) }}" 
+                               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {{ $category === $cat->name ? 'bg-amber-400 text-[#151311] shadow-xs' : 'text-[#A69785] bg-[#26211B] hover:bg-[#332C24]' }}">
+                                {{ $cat->name }} ({{ $cat->books_count }})
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <!-- Search Input -->
+                    <form action="{{ route('admin.dashboard') }}" method="GET" class="relative w-full md:w-72">
+                        <input type="hidden" name="tab" value="books">
+                        @if($category)
+                            <input type="hidden" name="category" value="{{ $category }}">
+                        @endif
+                        @if($stockFilter)
+                            <input type="hidden" name="stock_filter" value="{{ $stockFilter }}">
+                        @endif
+                        <i data-lucide="search" class="w-4 h-4 text-[#8E8070] absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" 
+                               name="q" 
+                               value="{{ request('q') }}"
+                               placeholder="Cari judul, penulis, penerbit..." 
+                               class="w-full pl-10 pr-4 py-2 bg-[#26211B] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                    </form>
                 </div>
 
-                <!-- Search Input -->
-                <form action="{{ route('admin.dashboard') }}" method="GET" class="relative w-full md:w-72">
-                    <input type="hidden" name="tab" value="books">
-                    @if($category)
-                        <input type="hidden" name="category" value="{{ $category }}">
-                    @endif
-                    <i data-lucide="search" class="w-4 h-4 text-[#8E8070] absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                    <input type="text" 
-                           name="q" 
-                           value="{{ request('q') }}"
-                           placeholder="Cari judul, penulis, penerbit..." 
-                           class="w-full pl-10 pr-4 py-2 bg-[#26211B] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
-                </form>
+                <!-- Stock Condition Filters (Point 3: Low Stock Alerts) -->
+                <div class="pt-3 border-t border-[#2C2620] flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#8E8070] font-medium text-[11px] uppercase tracking-wider">Kondisi Stok:</span>
+                        <a href="{{ route('admin.dashboard', ['tab' => 'books', 'category' => $category, 'q' => request('q')]) }}" 
+                           class="px-2.5 py-1 rounded-lg font-semibold transition {{ empty($stockFilter) ? 'bg-[#3D352B] text-amber-300 border border-amber-400/40' : 'text-[#8E8070] hover:text-white bg-[#211E1A]' }}">
+                            Semua
+                        </a>
+                        <a href="{{ route('admin.dashboard', ['tab' => 'books', 'stock_filter' => 'out', 'category' => $category, 'q' => request('q')]) }}" 
+                           class="px-2.5 py-1 rounded-lg font-semibold transition flex items-center gap-1.5 {{ $stockFilter === 'out' ? 'bg-red-950 text-red-300 border border-red-500' : 'text-red-400/80 bg-red-950/30 hover:bg-red-950/60 border border-red-500/20' }}">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span>Habis ({{ $outOfStockCount }})</span>
+                        </a>
+                        <a href="{{ route('admin.dashboard', ['tab' => 'books', 'stock_filter' => 'low', 'category' => $category, 'q' => request('q')]) }}" 
+                           class="px-2.5 py-1 rounded-lg font-semibold transition flex items-center gap-1.5 {{ $stockFilter === 'low' ? 'bg-amber-950 text-amber-300 border border-amber-500' : 'text-amber-400/80 bg-amber-950/30 hover:bg-amber-950/60 border border-amber-500/20' }}">
+                            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            <span>Menipis ≤ 3 ({{ $lowStockCount }})</span>
+                        </a>
+                        <a href="{{ route('admin.dashboard', ['tab' => 'books', 'stock_filter' => 'safe', 'category' => $category, 'q' => request('q')]) }}" 
+                           class="px-2.5 py-1 rounded-lg font-semibold transition flex items-center gap-1.5 {{ $stockFilter === 'safe' ? 'bg-emerald-950 text-emerald-300 border border-emerald-500' : 'text-emerald-400/80 bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-500/20' }}">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span>Aman (> 3)</span>
+                        </a>
+                    </div>
+
+                    <div class="text-[11px] text-[#A69785]">
+                        Total Fisik Buku: <strong class="text-amber-300">{{ number_format($totalStockQty) }}</strong> unit
+                    </div>
+                </div>
             </div>
 
             <!-- Books Grid Header -->
@@ -276,10 +311,23 @@
                                             <span class="font-bold text-amber-300">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
                                         </div>
                                         <div class="flex items-center justify-between text-xs">
-                                            <span class="text-[#8E8070]">Kuantitas Stok:</span>
-                                            <span class="font-bold font-mono px-2 py-0.5 rounded-lg {{ $bStock > 5 ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30' : 'bg-red-950 text-red-400 border border-red-500/30' }}">
-                                                {{ $bStock }} pcs
-                                            </span>
+                                            <span class="text-[#8E8070]">Kondisi Stok:</span>
+                                            @if($bStock <= 0)
+                                                <span class="font-bold text-[11px] font-mono px-2 py-0.5 rounded-lg bg-red-950/90 text-red-300 border border-red-500/50 flex items-center gap-1">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                                                    <span>Habis (0 pcs)</span>
+                                                </span>
+                                            @elseif($bStock <= 3)
+                                                <span class="font-bold text-[11px] font-mono px-2 py-0.5 rounded-lg bg-amber-950/90 text-amber-300 border border-amber-500/50 flex items-center gap-1">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                                    <span>Menipis ({{ $bStock }} pcs)</span>
+                                                </span>
+                                            @else
+                                                <span class="font-bold text-[11px] font-mono px-2 py-0.5 rounded-lg bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                    <span>Aman ({{ $bStock }} pcs)</span>
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -459,21 +507,34 @@
                                             Rp {{ number_format($order->total_price, 0, ',', '.') }}
                                         </td>
                                         
-                                        <!-- Form Ubah Status Pengiriman (BNSP PRD Spec) -->
+                                        <!-- Form Ubah Status Pengiriman (BNSP PRD Spec + Stock ACC Management) -->
                                         <td class="py-4 px-3">
                                             <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="flex items-center gap-1.5">
                                                 @csrf
                                                 @method('PUT')
                                                 <select name="status" class="px-2.5 py-1.5 bg-[#26211A] border border-[#3D352A] rounded-lg text-xs font-semibold text-white focus:outline-none focus:border-amber-400">
-                                                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending (Menunggu)</option>
-                                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing (Dikirim)</option>
+                                                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending (Menunggu ACC)</option>
+                                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing (ACC / Diproses)</option>
                                                     <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed (Selesai)</option>
                                                     <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled (Batal)</option>
                                                 </select>
-                                                <button type="submit" class="px-2.5 py-1.5 bg-[#3D352A] hover:bg-amber-500 hover:text-[#151311] text-amber-300 text-xs font-bold rounded-lg transition" title="Simpan Status">
+                                                <button type="submit" class="px-2.5 py-1.5 bg-[#3D352A] hover:bg-amber-500 hover:text-[#151311] text-amber-300 text-xs font-bold rounded-lg transition" title="Simpan Status & Update Stok">
                                                     ✓
                                                 </button>
                                             </form>
+
+                                            <!-- Status Pemotongan Stok -->
+                                            @if($order->stock_deducted)
+                                                <span class="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                    <span>Stok Telah Dipotong</span>
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 text-[9px] font-semibold text-amber-300 bg-amber-950/60 border border-amber-500/30 px-1.5 py-0.5 rounded mt-1.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                                    <span>Belum Di-ACC (Stok Utuh)</span>
+                                                </span>
+                                            @endif
                                         </td>
 
                                         <td class="py-4 px-3 text-[#8E8070] text-[10px]">

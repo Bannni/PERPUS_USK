@@ -21,6 +21,7 @@ class AdminBookController extends Controller
         $activeTab = $request->input('tab', 'books');
         $search = $request->input('q');
         $category = $request->input('category');
+        $stockFilter = $request->input('stock_filter');
 
         // 1. Books query with stocks and categories
         $bookQuery = Book::with(['stock', 'categoryRelation']);
@@ -40,8 +41,31 @@ class AdminBookController extends Controller
                   });
             });
         }
+
+        // Low stock / Out of stock filter
+        if ($stockFilter === 'low') {
+            $bookQuery->whereHas('stock', function ($q) {
+                $q->where('quantity', '>', 0)->where('quantity', '<=', 3);
+            });
+        } elseif ($stockFilter === 'out') {
+            $bookQuery->where(function ($q) {
+                $q->whereDoesntHave('stock')
+                  ->orWhereHas('stock', function ($sub) {
+                      $sub->where('quantity', '<=', 0);
+                  });
+            });
+        } elseif ($stockFilter === 'safe') {
+            $bookQuery->whereHas('stock', function ($q) {
+                $q->where('quantity', '>', 3);
+            });
+        }
+
         $books = $bookQuery->latest()->paginate(9, ['*'], 'books_page')->withQueryString();
         $categories = Category::withCount('books')->get();
+
+        // Stock stats
+        $lowStockCount = Stock::where('quantity', '>', 0)->where('quantity', '<=', 3)->count();
+        $outOfStockCount = Stock::where('quantity', '<=', 0)->count() + Book::doesntHave('stock')->count();
 
         // 2. Users query
         $userQuery = User::withCount(['orders'])
@@ -88,7 +112,10 @@ class AdminBookController extends Controller
             'totalAdmins',
             'totalStockQty',
             'search',
-            'category'
+            'category',
+            'stockFilter',
+            'lowStockCount',
+            'outOfStockCount'
         ));
     }
 
