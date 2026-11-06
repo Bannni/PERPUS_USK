@@ -307,7 +307,7 @@
 
                         <!-- Submit Button -->
                         <div class="pt-2">
-                            <div x-show="selectedIds.length === 0" class="mb-3 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center gap-2">
+                            <div x-show="selectedIds.length === 0" style="display: none;" class="mb-3 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center gap-2">
                                 <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 shrink-0"></i>
                                 <span>Pilih minimal 1 buku di keranjang untuk checkout.</span>
                             </div>

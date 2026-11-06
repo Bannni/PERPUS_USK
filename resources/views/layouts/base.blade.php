@@ -133,6 +133,11 @@
             pointer-events: none;
         }
 
+        /* Alpine Cloak to prevent FOUC / flickering modals on page reload */
+        [x-cloak] {
+            display: none !important;
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;

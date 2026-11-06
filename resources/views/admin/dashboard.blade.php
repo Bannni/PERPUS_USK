@@ -742,6 +742,7 @@
     <!-- ============================================================== -->
     <div x-show="createModalOpen" 
          x-cloak 
+         style="display: none;"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
          @keydown.escape.window="createModalOpen = false">
         
@@ -848,6 +849,7 @@
     <!-- ============================================================== -->
     <div x-show="editModalOpen" 
          x-cloak 
+         style="display: none;"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
          @keydown.escape.window="editModalOpen = false">
         
@@ -959,6 +961,7 @@
     <!-- ============================================================== -->
     <div x-show="categoryModalOpen" 
          x-cloak 
+         style="display: none;"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
          @keydown.escape.window="categoryModalOpen = false">
         
@@ -1006,6 +1009,7 @@
     <!-- ============================================================== -->
     <div x-show="deleteModalOpen" 
          x-cloak 
+         style="display: none;"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
          @keydown.escape.window="deleteModalOpen = false">
         

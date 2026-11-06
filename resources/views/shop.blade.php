@@ -193,6 +193,7 @@
     <!-- BUY MODAL (CHECKOUT DRAWER) -->
     <div x-show="buyModalOpen" 
          x-cloak 
+         style="display: none;"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
          @keydown.escape.window="buyModalOpen = false">
         
