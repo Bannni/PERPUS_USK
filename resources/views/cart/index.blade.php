@@ -39,24 +39,58 @@
 
         <!-- Title -->
         <div class="mb-8">
-            <span class="text-xs uppercase font-bold tracking-widest text-[#9C8B7E]">Alur Transaksi BNSP</span>
+            <span class="text-xs uppercase font-bold tracking-widest text-[#9C8B7E]">Transaksi Toko Buku</span>
             <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#4A3222] mt-1">Keranjang Belanja Buku</h1>
             <p class="text-xs sm:text-sm text-[#7A6B60] mt-1">
-                Kelola item buku, sesuaikan kuantitas, dan lanjutkan ke checkout dengan metode <strong>Payment at Delivery (COD)</strong>.
+                Pilih buku yang ingin dibeli, sesuaikan kuantitas, dan lanjutkan ke formulir pengiriman checkout.
             </p>
         </div>
 
         @if($carts->count() > 0)
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            @php
+                $cartPayload = $carts->map(function($c) {
+                    return [
+                        'id' => (string) $c->id,
+                        'price' => (float) $c->book->price,
+                        'quantity' => (int) $c->quantity,
+                        'title' => $c->book->title,
+                    ];
+                })->values();
+            @endphp
+
+            <div x-data="cartCheckoutManager({{ json_encode($cartPayload) }})" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 <!-- Left: Cart Items Table/Cards (8 cols) -->
                 <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+
+                    <!-- Select All Bar -->
+                    <div class="p-4 bg-white border border-[#EFE5D7] rounded-2xl flex items-center justify-between shadow-xs">
+                        <label class="flex items-center gap-3 cursor-pointer text-xs font-bold text-[#4A3222] select-none">
+                            <input type="checkbox" 
+                                   :checked="allSelected" 
+                                   @change="toggleSelectAll()" 
+                                   class="w-4 h-4 text-[#7A5034] rounded border-[#DACBB8] focus:ring-[#7A5034] cursor-pointer">
+                            <span>Pilih Semua (<span x-text="items.length">{{ $carts->count() }}</span> buku)</span>
+                        </label>
+                        <span class="text-xs text-[#8C7A6D]">
+                            Terpilih: <strong class="text-[#7A5034]" x-text="selectedIds.length">{{ $carts->count() }}</strong> buku
+                        </span>
+                    </div>
+
                     <div class="bg-white border border-[#EFE5D7] rounded-3xl p-5 sm:p-6 shadow-xs divide-y divide-[#F2EAE0]">
                         @foreach($carts as $item)
-                            <div class="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                <!-- Cover & Details -->
-                                <div class="flex items-center gap-4">
-                                    <div class="w-16 sm:w-20 aspect-[2/3] rounded-xl overflow-hidden shadow-sm shrink-0 border border-[#E5DACB] bg-[#FAF7F2]">
+                            <div class="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-opacity"
+                                 :class="isSelected('{{ $item->id }}') ? 'opacity-100' : 'opacity-50'">
+                                <!-- Checkbox, Cover & Details -->
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <label class="cursor-pointer select-none p-1 shrink-0" title="Pilih buku ini">
+                                        <input type="checkbox" 
+                                               value="{{ $item->id }}" 
+                                               :checked="isSelected('{{ $item->id }}')" 
+                                               @change="toggleItem('{{ $item->id }}')" 
+                                               class="w-4 h-4 text-[#7A5034] rounded border-[#DACBB8] focus:ring-[#7A5034] cursor-pointer">
+                                    </label>
+                                    <div class="w-16 sm:w-20 aspect-[2/3] rounded-xl border border-[#E5DACB] overflow-hidden shadow-sm shrink-0 bg-[#FAF7F2]">
                                         <img src="{{ $item->book->cover_url }}" 
                                              alt="{{ $item->book->title }}" 
                                              onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
@@ -152,8 +186,8 @@
                     <!-- Price Calculations -->
                     <div class="space-y-3 pb-4 border-b border-[#F2EAE0] text-xs">
                         <div class="flex justify-between text-[#7A6B60]">
-                            <span>Subtotal Buku ({{ $carts->sum('quantity') }} eks):</span>
-                            <span class="font-semibold text-[#4A3222]">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                            <span>Buku Terpilih (<span x-text="selectedTotalQuantity">{{ $carts->sum('quantity') }}</span> eks):</span>
+                            <span class="font-semibold text-[#4A3222]" x-text="formatRupiah(selectedSubtotal)">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between text-[#7A6B60]">
                             <span>Biaya Pengiriman:</span>
@@ -161,15 +195,25 @@
                         </div>
                         <div class="pt-2 flex justify-between items-center text-sm">
                             <span class="font-bold text-[#4A3222]">Total Pembayaran:</span>
-                            <span class="font-serif text-2xl font-bold text-[#7A5034]">
+                            <span class="font-serif text-2xl font-bold text-[#7A5034]" x-text="formatRupiah(selectedSubtotal)">
                                 Rp {{ number_format($subtotal, 0, ',', '.') }}
                             </span>
                         </div>
                     </div>
 
                     <!-- Checkout Form (POST /checkout) -->
-                    <form action="{{ route('checkout') }}" method="POST" class="space-y-4">
+                    <form id="checkout-form" action="{{ route('checkout') }}" method="POST" class="space-y-4">
                         @csrf
+
+                        <!-- Hidden Inputs for selected cart IDs -->
+                        <template x-for="id in selectedIds" :key="id">
+                            <input type="hidden" name="selected_carts[]" :value="id">
+                        </template>
+                        <noscript>
+                            @foreach($carts as $item)
+                                <input type="hidden" name="selected_carts[]" value="{{ $item->id }}">
+                            @endforeach
+                        </noscript>
 
                         <!-- Shipping Address -->
                         <div>
@@ -182,32 +226,72 @@
                                       required 
                                       placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota/kabupaten, kode pos..." 
                                       class="w-full px-3.5 py-2.5 bg-[#FAF7F2] border border-[#E0D5C7] rounded-xl text-xs text-[#4A3222] placeholder-[#A8988B] focus:outline-none focus:ring-2 focus:ring-[#7A5034]/30 leading-relaxed">{{ old('shipping_address') }}</textarea>
-                            <span class="text-[10px] text-[#9C8B7E] block mt-1">Kurir akan mengirim buku ke alamat ini.</span>
+                            <span class="text-[10px] text-[#9C8B7E] block mt-1">Kurir akan mengirim buku fisik ke alamat ini.</span>
                         </div>
 
-                        <!-- Payment Method (PRD Requirement: Payment at Delivery) -->
+                        <!-- Payment Method (Samakan dengan Beli Langsung) -->
                         <div>
                             <label class="block text-xs font-bold text-[#5C534B] mb-1.5 flex items-center gap-1.5">
                                 <i data-lucide="wallet" class="w-3.5 h-3.5 text-[#7A5034]"></i>
                                 <span>Metode Pembayaran *</span>
                             </label>
 
-                            <div class="p-3.5 rounded-2xl border-2 border-[#7A5034] bg-[#FAF7F2] flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <input type="radio" 
-                                           id="payment_cod" 
-                                           name="payment_method" 
-                                           value="Payment at Delivery (COD)" 
-                                           checked 
-                                           class="w-4 h-4 text-[#7A5034] focus:ring-[#7A5034]">
-                                    <label for="payment_cod" class="cursor-pointer">
-                                        <span class="text-xs font-bold text-[#4A3222] block">Payment at Delivery (COD)</span>
-                                        <span class="text-[10px] text-[#7A6B60] block">Bayar tunai di tempat saat kurir menyerahkan buku</span>
-                                    </label>
-                                </div>
-                                <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">
-                                    Resmi BNSP
-                                </span>
+                            <div class="space-y-2">
+                                <label class="p-3 rounded-2xl border-2 border-[#E0D5C7] has-checked:border-[#7A5034] has-checked:bg-[#FAF7F2] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" 
+                                               name="payment_method" 
+                                               value="QRIS (Instant)" 
+                                               checked 
+                                               class="w-4 h-4 text-[#7A5034] focus:ring-[#7A5034]">
+                                        <div>
+                                            <span class="text-xs font-bold text-[#4A3222] block">QRIS (Instant)</span>
+                                            <span class="text-[10px] text-[#7A6B60] block">Scan barcode via GoPay, OVO, BCA, Livin, dll.</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">
+                                        Instan
+                                    </span>
+                                </label>
+
+                                <label class="p-3 rounded-2xl border-2 border-[#E0D5C7] has-checked:border-[#7A5034] has-checked:bg-[#FAF7F2] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" 
+                                               name="payment_method" 
+                                               value="Transfer Bank BCA/Mandiri" 
+                                               class="w-4 h-4 text-[#7A5034] focus:ring-[#7A5034]">
+                                        <div>
+                                            <span class="text-xs font-bold text-[#4A3222] block">Transfer Bank BCA / Mandiri</span>
+                                            <span class="text-[10px] text-[#7A6B60] block">Transfer via Virtual Account / ATM / M-Banking</span>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="p-3 rounded-2xl border-2 border-[#E0D5C7] has-checked:border-[#7A5034] has-checked:bg-[#FAF7F2] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" 
+                                               name="payment_method" 
+                                               value="E-Wallet GoPay/OVO" 
+                                               class="w-4 h-4 text-[#7A5034] focus:ring-[#7A5034]">
+                                        <div>
+                                            <span class="text-xs font-bold text-[#4A3222] block">E-Wallet (GoPay / OVO)</span>
+                                            <span class="text-[10px] text-[#7A6B60] block">Pembayaran saldo langsung dompet digital</span>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="p-3 rounded-2xl border-2 border-[#E0D5C7] has-checked:border-[#7A5034] has-checked:bg-[#FAF7F2] flex items-center justify-between cursor-pointer transition">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" 
+                                               name="payment_method" 
+                                               value="Payment at Delivery (COD)" 
+                                               class="w-4 h-4 text-[#7A5034] focus:ring-[#7A5034]">
+                                        <div>
+                                            <span class="text-xs font-bold text-[#4A3222] block">Payment at Delivery (COD)</span>
+                                            <span class="text-[10px] text-[#7A6B60] block">Bayar tunai di tempat saat kurir menyerahkan buku</span>
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 
@@ -223,12 +307,20 @@
 
                         <!-- Submit Button -->
                         <div class="pt-2">
-                            <button type="submit" class="w-full py-3.5 bg-[#7A5034] hover:bg-[#5F3D27] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]">
+                            <div x-show="selectedIds.length === 0" class="mb-3 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center gap-2">
+                                <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                                <span>Pilih minimal 1 buku di keranjang untuk checkout.</span>
+                            </div>
+
+                            <button type="submit" 
+                                    :disabled="selectedIds.length === 0" 
+                                    :class="selectedIds.length === 0 ? 'opacity-50 cursor-not-allowed bg-stone-400' : 'bg-[#7A5034] hover:bg-[#5F3D27] hover:scale-[1.01] active:scale-[0.99]'"
+                                    class="w-full py-3.5 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i data-lucide="check-circle" class="w-4 h-4"></i>
-                                <span>Proses Checkout (COD)</span>
+                                <span>Proses Checkout (<span x-text="selectedIds.length">{{ $carts->count() }}</span> Buku)</span>
                             </button>
                             <p class="text-[10px] text-center text-[#9C8B7E] mt-2">
-                                Stok buku pada tabel <code>stocks</code> akan otomatis berkurang setelah pesanan berhasil dibuat.
+                                Stok buku fisik akan otomatis berkurang setelah pesanan disetujui (ACC) oleh Admin.
                             </p>
                         </div>
                     </form>
@@ -273,3 +365,56 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function cartCheckoutManager(initialItems) {
+        return {
+            items: initialItems,
+            selectedIds: initialItems.map(item => String(item.id)),
+
+            get allSelected() {
+                return this.items.length > 0 && this.selectedIds.length === this.items.length;
+            },
+
+            toggleSelectAll() {
+                if (this.allSelected) {
+                    this.selectedIds = [];
+                } else {
+                    this.selectedIds = this.items.map(item => String(item.id));
+                }
+            },
+
+            toggleItem(id) {
+                const strId = String(id);
+                const idx = this.selectedIds.indexOf(strId);
+                if (idx > -1) {
+                    this.selectedIds.splice(idx, 1);
+                } else {
+                    this.selectedIds.push(strId);
+                }
+            },
+
+            isSelected(id) {
+                return this.selectedIds.includes(String(id));
+            },
+
+            get selectedTotalQuantity() {
+                return this.items
+                    .filter(item => this.isSelected(item.id))
+                    .reduce((acc, item) => acc + item.quantity, 0);
+            },
+
+            get selectedSubtotal() {
+                return this.items
+                    .filter(item => this.isSelected(item.id))
+                    .reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            },
+
+            formatRupiah(amount) {
+                return 'Rp ' + Number(amount).toLocaleString('id-ID');
+            }
+        };
+    }
+</script>
+@endpush

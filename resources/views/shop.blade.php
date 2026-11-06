@@ -236,15 +236,28 @@
                                     <label class="block text-xs font-semibold text-[#5C534B] mb-1">Metode Pembayaran</label>
                                     <select name="payment_method" class="w-full px-3 py-2 bg-white border border-[#DACAB6] rounded-xl text-xs font-medium text-[#4A3222] focus:outline-none">
                                         <option value="QRIS (Instant)">QRIS (Instant)</option>
-                                        <option value="Transfer Bank BCA/Mandiri">Transfer Bank</option>
-                                        <option value="E-Wallet GoPay/OVO">E-Wallet</option>
+                                        <option value="Transfer Bank BCA/Mandiri">Transfer Bank BCA / Mandiri</option>
+                                        <option value="E-Wallet GoPay/OVO">E-Wallet (GoPay / OVO)</option>
+                                        <option value="Payment at Delivery (COD)">Payment at Delivery (COD)</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div>
+                                <label class="block text-xs font-semibold text-[#5C534B] mb-1">
+                                    Alamat Pengiriman Lengkap <span class="text-red-500">*</span>
+                                </label>
+                                <textarea name="shipping_address" 
+                                          rows="2" 
+                                          required 
+                                          placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota/kabupaten, kode pos..." 
+                                          class="w-full px-3 py-2 bg-white border border-[#DACAB6] rounded-xl text-xs text-[#4A3222] placeholder-[#B5ABA0] focus:outline-none focus:ring-1 focus:ring-[#7A5034]">{{ old('shipping_address') }}</textarea>
+                                <span class="text-[10px] text-[#9C8B7E] block mt-0.5">Buku fisik akan dikirimkan ke alamat ini setelah pesanan disetujui (ACC).</span>
+                            </div>
+
+                            <div>
                                 <label class="block text-xs font-semibold text-[#5C534B] mb-1">Catatan Pembelian (Opsional)</label>
-                                <input type="text" name="buyer_notes" placeholder="Contoh: Tambahkan ke rak koleksi utama" class="w-full px-3 py-2 bg-white border border-[#DACAB6] rounded-xl text-xs text-[#4A3222] placeholder-[#B5ABA0] focus:outline-none">
+                                <input type="text" name="buyer_notes" placeholder="Contoh: Titipkan ke satpam jika sedang keluar" class="w-full px-3 py-2 bg-white border border-[#DACAB6] rounded-xl text-xs text-[#4A3222] placeholder-[#B5ABA0] focus:outline-none">
                             </div>
 
                             <div class="bg-[#F2E8DC] p-4 rounded-2xl flex items-center justify-between border border-[#E3D6C5]">
@@ -252,8 +265,8 @@
                                     <span class="text-[10px] uppercase font-bold text-[#8C7A6D] block">Total Pembayaran:</span>
                                     <span class="font-serif text-2xl font-bold text-[#7A5034]" x-text="'Rp ' + (selectedBook.price * buyQuantity).toLocaleString('id-ID')"></span>
                                 </div>
-                                <span class="text-[10px] text-emerald-800 bg-emerald-100 font-semibold px-2.5 py-1 rounded-full">
-                                    ✓ Langsung Masuk Rak 3D
+                                <span class="text-[10px] text-amber-800 bg-amber-100 font-semibold px-2.5 py-1 rounded-full">
+                                    ✓ Dikirim ke Rumah (Menunggu ACC)
                                 </span>
                             </div>
 

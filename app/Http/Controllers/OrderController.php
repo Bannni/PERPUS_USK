@@ -37,17 +37,29 @@ class OrderController extends Controller
             'shipping_address' => ['required', 'string', 'min:10', 'max:500'],
             'payment_method' => ['required', 'string', 'max:100'],
             'buyer_notes' => ['nullable', 'string', 'max:255'],
+            'selected_carts' => ['nullable', 'array'],
+            'selected_carts.*' => ['integer'],
         ], [
             'shipping_address.required' => 'Alamat pengiriman lengkap wajib diisi.',
             'shipping_address.min' => 'Alamat pengiriman minimal 10 karakter.',
-            'payment_method.required' => 'Pilih metode pembayaran (Payment at Delivery).',
+            'payment_method.required' => 'Pilih metode pembayaran.',
         ]);
 
         $userId = Auth::id();
-        $cartItems = Cart::with(['book.stock'])->where('user_id', $userId)->get();
+        $query = Cart::with(['book.stock'])->where('user_id', $userId);
+
+        if ($request->has('selected_carts')) {
+            $selectedIds = $request->input('selected_carts');
+            if (empty($selectedIds)) {
+                return redirect()->route('cart.index')->with('error', 'Pilih minimal satu buku di keranjang untuk diproses ke checkout!');
+            }
+            $query->whereIn('id', $selectedIds);
+        }
+
+        $cartItems = $query->get();
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Keranjang belanja Anda masih kosong!');
+            return redirect()->route('cart.index')->with('error', 'Tidak ada buku yang dipilih atau keranjang belanja Anda masih kosong!');
         }
 
         DB::beginTransaction();
@@ -94,8 +106,8 @@ class OrderController extends Controller
                 ]);
             }
 
-            // Empty the user's cart
-            Cart::where('user_id', $userId)->delete();
+            // Empty only the selected cart items from user's cart
+            Cart::where('user_id', $userId)->whereIn('id', $cartItems->pluck('id'))->delete();
 
             DB::commit();
 
@@ -114,9 +126,13 @@ class OrderController extends Controller
         $validated = $request->validate([
             'book_id' => ['required', 'exists:books,id'],
             'quantity' => ['nullable', 'integer', 'min:1', 'max:10'],
-            'payment_method' => ['nullable', 'string', 'max:50'],
-            'shipping_address' => ['nullable', 'string', 'max:500'],
+            'payment_method' => ['required', 'string', 'max:100'],
+            'shipping_address' => ['required', 'string', 'min:10', 'max:500'],
             'buyer_notes' => ['nullable', 'string', 'max:255'],
+        ], [
+            'shipping_address.required' => 'Alamat pengiriman lengkap wajib diisi.',
+            'shipping_address.min' => 'Alamat pengiriman minimal 10 karakter.',
+            'payment_method.required' => 'Pilih metode pembayaran.',
         ]);
 
         $book = Book::with('stock')->findOrFail($validated['book_id']);
@@ -142,10 +158,10 @@ class OrderController extends Controller
                 'book_id' => $book->id,
                 'quantity' => $quantity,
                 'total_price' => $totalPrice,
-                'payment_method' => $validated['payment_method'] ?? 'Payment at Delivery (COD)',
+                'payment_method' => $validated['payment_method'],
                 'status' => 'pending',
                 'stock_deducted' => false,
-                'shipping_address' => $validated['shipping_address'] ?? 'Pengiriman standar ke alamat terdaftar',
+                'shipping_address' => $validated['shipping_address'],
                 'buyer_notes' => $validated['buyer_notes'] ?? null,
             ]);
 
