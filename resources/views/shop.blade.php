@@ -7,6 +7,9 @@
     selectedBook: null,
     buyModalOpen: false,
     buyQuantity: 1,
+    get maxStock() {
+        return (this.selectedBook && this.selectedBook.stock) ? Math.max(1, this.selectedBook.stock.quantity) : 1;
+    },
     openBuy(book) {
         this.selectedBook = book;
         this.buyQuantity = 1;
@@ -218,6 +221,9 @@
                             <h3 class="font-serif text-lg font-bold text-[#4A3222] mt-1" x-text="selectedBook.title"></h3>
                             <p class="text-xs text-[#8C7A6D]" x-text="'Penulis: ' + selectedBook.author"></p>
                             <p class="text-sm font-bold text-[#7A5034] mt-1" x-text="'Rp ' + Number(selectedBook.price).toLocaleString('id-ID')"></p>
+                            <div class="mt-1.5 flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-md" x-text="'Tersisa: ' + maxStock + ' eksemplar'"></span>
+                            </div>
                         </div>
                     </div>
 
@@ -229,8 +235,35 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-semibold text-[#5C534B] mb-1">Jumlah Eksemplar</label>
-                                    <input type="number" name="quantity" min="1" max="5" x-model="buyQuantity" class="w-full px-3 py-2 bg-white border border-[#DACAB6] rounded-xl text-xs font-semibold text-[#4A3222] focus:outline-none">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-semibold text-[#5C534B]">Jumlah Beli</label>
+                                        <span class="text-[10px] text-[#8C7A6D]" x-text="'Maks ' + maxStock + ' eks'"></span>
+                                    </div>
+                                    <div class="flex items-center border border-[#DACAB6] rounded-xl overflow-hidden bg-white">
+                                        <button type="button" 
+                                                @click="if (buyQuantity > 1) buyQuantity--" 
+                                                :disabled="buyQuantity <= 1"
+                                                class="px-3 py-2 text-xs font-bold text-[#5F3D27] hover:bg-[#FAF7F2] transition disabled:opacity-30 disabled:cursor-not-allowed select-none">
+                                            -
+                                        </button>
+                                        <input type="number" 
+                                               name="quantity" 
+                                               min="1" 
+                                               :max="maxStock" 
+                                               x-model.number="buyQuantity" 
+                                               @input="if (buyQuantity > maxStock) buyQuantity = maxStock; if (buyQuantity < 1) buyQuantity = 1;"
+                                               class="w-full py-2 text-center text-xs font-bold text-[#4A3222] focus:outline-none border-x border-[#DACAB6]">
+                                        <button type="button" 
+                                                @click="if (buyQuantity < maxStock) buyQuantity++" 
+                                                :disabled="buyQuantity >= maxStock"
+                                                class="px-3 py-2 text-xs font-bold text-[#5F3D27] hover:bg-[#FAF7F2] transition disabled:opacity-30 disabled:cursor-not-allowed select-none"
+                                                :title="buyQuantity >= maxStock ? 'Maksimal stok tercapai' : 'Tambah kuantitas'">
+                                            +
+                                        </button>
+                                    </div>
+                                    <p x-show="buyQuantity >= maxStock" class="text-[9px] font-semibold text-amber-700 mt-1">
+                                        Maksimum sesuai sisa stok.
+                                    </p>
                                 </div>
 
                                 <div>

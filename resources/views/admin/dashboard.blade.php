@@ -763,8 +763,12 @@
                 @csrf
 
                 <div>
-                    <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Judul Buku *</label>
-                    <input type="text" name="title" required placeholder="Contoh: The Psychology of Money" class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                    <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Judul Buku (Harus Unik) *</label>
+                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="Contoh: The Psychology of Money" class="w-full px-4 py-2.5 bg-[#26211A] border @error('title') border-red-500 @else border-[#3D352A] @enderror rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                    <span class="text-[10px] text-[#8E8070] mt-1 block">Judul buku tidak boleh sama dengan buku yang sudah ada di katalog.</span>
+                    @error('title')
+                        <span class="text-[10px] text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -873,8 +877,9 @@
                         @method('PUT')
 
                         <div>
-                            <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Judul Buku *</label>
+                            <label class="block text-xs font-semibold text-[#D4C7B8] mb-1">Judul Buku (Harus Unik) *</label>
                             <input type="text" name="title" x-model="selectedBook.title" required class="w-full px-4 py-2.5 bg-[#26211A] border border-[#3D352A] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                            <span class="text-[10px] text-[#8E8070] mt-1 block">Judul buku tidak boleh sama dengan buku lain yang sudah ada di katalog.</span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

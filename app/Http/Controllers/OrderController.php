@@ -125,18 +125,20 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'book_id' => ['required', 'exists:books,id'],
-            'quantity' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'quantity' => ['required', 'integer', 'min:1'],
             'payment_method' => ['required', 'string', 'max:100'],
             'shipping_address' => ['required', 'string', 'min:10', 'max:500'],
             'buyer_notes' => ['nullable', 'string', 'max:255'],
         ], [
+            'quantity.required' => 'Jumlah pembelian buku wajib diisi.',
+            'quantity.min' => 'Jumlah pembelian minimal 1 eksemplar.',
             'shipping_address.required' => 'Alamat pengiriman lengkap wajib diisi.',
             'shipping_address.min' => 'Alamat pengiriman minimal 10 karakter.',
             'payment_method.required' => 'Pilih metode pembayaran.',
         ]);
 
         $book = Book::with('stock')->findOrFail($validated['book_id']);
-        $quantity = $validated['quantity'] ?? 1;
+        $quantity = (int) $validated['quantity'];
 
         DB::beginTransaction();
 
@@ -145,7 +147,7 @@ class OrderController extends Controller
             $currentStock = $stock ? $stock->quantity : 0;
             if ($quantity > $currentStock) {
                 DB::rollBack();
-                return back()->with('error', "Stok buku '{$book->title}' tidak mencukupi (Tersisa: {$currentStock})!");
+                return back()->with('error', "Jumlah pembelian ({$quantity} eks) melebihi stok yang tersedia! Sisa stok buku '{$book->title}' hanya {$currentStock} eksemplar.");
             }
 
             $totalPrice = $book->price * $quantity;

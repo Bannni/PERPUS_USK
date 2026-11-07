@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class BookController extends Controller
 {
@@ -25,7 +26,7 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255', 'unique:books,title'],
             'author' => ['required', 'string', 'max:255'],
             'publisher' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
@@ -39,6 +40,7 @@ class BookController extends Controller
             'description' => ['nullable', 'string'],
         ], [
             'title.required' => 'Judul buku wajib diisi.',
+            'title.unique' => 'Judul buku sudah terdaftar dalam katalog! Tidak boleh menambahkan buku dengan judul yang sama.',
             'author.required' => 'Nama penulis wajib diisi.',
             'category_id.required' => 'Kategori buku wajib dipilih.',
             'price.required' => 'Harga buku wajib diisi.',
@@ -86,7 +88,7 @@ class BookController extends Controller
         $book = Book::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255', Rule::unique('books', 'title')->ignore($book->id)],
             'author' => ['required', 'string', 'max:255'],
             'publisher' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
@@ -98,6 +100,13 @@ class BookController extends Controller
             'pages' => ['nullable', 'integer', 'min:1'],
             'published_year' => ['nullable', 'integer'],
             'description' => ['nullable', 'string'],
+        ], [
+            'title.required' => 'Judul buku wajib diisi.',
+            'title.unique' => 'Judul buku sudah terdaftar dalam katalog! Tidak boleh menggunakan judul yang sama dengan buku lain.',
+            'author.required' => 'Nama penulis wajib diisi.',
+            'category_id.required' => 'Kategori buku wajib dipilih.',
+            'price.required' => 'Harga buku wajib diisi.',
+            'stock_quantity.required' => 'Jumlah stok buku wajib diisi.',
         ]);
 
         if ($request->hasFile('cover_file')) {

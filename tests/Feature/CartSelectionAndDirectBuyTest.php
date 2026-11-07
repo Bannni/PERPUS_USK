@@ -184,4 +184,82 @@ class CartSelectionAndDirectBuyTest extends TestCase
         $response->assertSee('Transfer Bank BCA/Mandiri');
         $response->assertSee('E-Wallet GoPay/OVO');
     }
+
+    /**
+     * 7. Direct buy rejects quantity exceeding available stock.
+     */
+    public function test_direct_buy_rejects_quantity_exceeding_available_stock()
+    {
+        $this->bookA->stock()->update(['quantity' => 3]);
+
+        // Trying to buy 5 when stock is only 3
+        $response = $this->actingAs($this->user)->post(route('orders.store'), [
+            'book_id' => $this->bookA->id,
+            'quantity' => 5,
+            'payment_method' => 'QRIS (Instant)',
+            'shipping_address' => 'Jl. Salemba Raya No. 10, Jakarta Pusat, DKI Jakarta',
+        ]);
+
+        $response->assertSessionHas('error');
+        $this->assertEquals(0, Order::count());
+
+        // Buying 3 (exact available stock) succeeds
+        $responseSuccess = $this->actingAs($this->user)->post(route('orders.store'), [
+            'book_id' => $this->bookA->id,
+            'quantity' => 3,
+            'payment_method' => 'QRIS (Instant)',
+            'shipping_address' => 'Jl. Salemba Raya No. 10, Jakarta Pusat, DKI Jakarta',
+        ]);
+
+        $responseSuccess->assertRedirect(route('orders.index'));
+        $this->assertEquals(1, Order::count());
+    }
+
+    /**
+     * 8. Admin cannot create book with duplicate title.
+     */
+    public function test_admin_cannot_create_book_with_duplicate_title()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = Category::first();
+
+        $response = $this->actingAs($admin)->post(route('admin.books.store'), [
+            'title' => 'Bumi Manusia', // duplicate with bookA
+            'author' => 'Pramoedya',
+            'category_id' => $category->id,
+            'price' => 90000,
+            'stock_quantity' => 10,
+        ]);
+
+        $response->assertSessionHasErrors(['title']);
+    }
+
+    /**
+     * 9. Admin can update book keeping its own title, but cannot use another existing book's title.
+     */
+    public function test_admin_title_unique_rule_on_update()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = Category::first();
+
+        // 1. Updating bookA keeping same title -> SUCCESS
+        $response1 = $this->actingAs($admin)->put(route('admin.books.update', $this->bookA->id), [
+            'title' => 'Bumi Manusia',
+            'author' => 'Pramoedya Ananta Toer Updated',
+            'category_id' => $category->id,
+            'price' => 95000,
+            'stock_quantity' => 15,
+        ]);
+        $response1->assertSessionHasNoErrors();
+
+        // 2. Updating bookB to have bookA's title -> FAIL DUPLICATE
+        $response2 = $this->actingAs($admin)->put(route('admin.books.update', $this->bookB->id), [
+            'title' => 'Bumi Manusia',
+            'author' => 'Author',
+            'category_id' => $category->id,
+            'price' => 100000,
+            'stock_quantity' => 5,
+        ]);
+        $response2->assertSessionHasErrors(['title']);
+    }
 }

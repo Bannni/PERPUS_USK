@@ -10,6 +10,7 @@ use App\Models\Stock;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class AdminBookController extends Controller
 {
@@ -155,7 +156,7 @@ class AdminBookController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255', 'unique:books,title'],
             'author' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
             'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
@@ -168,6 +169,7 @@ class AdminBookController extends Controller
             'synopsis' => ['nullable', 'string'],
         ], [
             'title.required' => 'Judul buku wajib diisi.',
+            'title.unique' => 'Judul buku sudah terdaftar dalam katalog! Tidak boleh menambahkan buku dengan judul yang sama.',
             'author.required' => 'Nama penulis wajib diisi.',
             'category.required' => 'Kategori / Genre wajib diisi.',
             'price.required' => 'Harga buku wajib diisi.',
@@ -197,7 +199,7 @@ class AdminBookController extends Controller
         $book = Book::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255', Rule::unique('books', 'title')->ignore($book->id)],
             'author' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
             'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
@@ -208,6 +210,12 @@ class AdminBookController extends Controller
             'pages' => ['nullable', 'integer', 'min:1'],
             'published_year' => ['nullable', 'integer'],
             'synopsis' => ['nullable', 'string'],
+        ], [
+            'title.required' => 'Judul buku wajib diisi.',
+            'title.unique' => 'Judul buku sudah terdaftar dalam katalog! Tidak boleh menggunakan judul yang sama dengan buku lain.',
+            'author.required' => 'Nama penulis wajib diisi.',
+            'category.required' => 'Kategori / Genre wajib diisi.',
+            'price.required' => 'Harga buku wajib diisi.',
         ]);
 
         if ($request->hasFile('cover_file')) {
