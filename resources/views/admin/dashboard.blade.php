@@ -12,10 +12,13 @@
     bookToDelete: null,
     categoryModalOpen: false,
     selectedCategory: null,
+    createCoverPreview: null,
+    editCoverPreview: null,
     openEdit(book) {
         this.selectedBook = JSON.parse(JSON.stringify(book));
         this.selectedBook.stock_quantity = book.stock ? book.stock.quantity : 10;
         this.selectedBook.description = book.description || book.synopsis || '';
+        this.editCoverPreview = book.cover_image || book.cover_url || null;
         this.editModalOpen = true;
     },
     confirmDelete(book) {
@@ -803,15 +806,32 @@
                     </div>
                 </div>
 
-                <!-- Cover Image (Upload or URL) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#26211A] p-3 rounded-2xl border border-[#3D352A]">
-                    <div>
-                        <label class="block text-xs font-semibold text-amber-300 mb-1">Upload Berkas Sampul (Storage)</label>
-                        <input type="file" name="cover_file" accept="image/*" class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
+                <!-- Cover Image (Upload or URL) with Live Preview -->
+                <div class="bg-[#26211A] p-3.5 rounded-2xl border border-[#3D352A] space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-amber-300 mb-1">Upload Berkas Sampul (Storage)</label>
+                            <input type="file" 
+                                   name="cover_file" 
+                                   accept="image/*" 
+                                   @change="const f = $event.target.files[0]; if (f) { createCoverPreview = URL.createObjectURL(f); }"
+                                   class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Gunakan URL Gambar</label>
+                            <input type="url" 
+                                   name="cover_url" 
+                                   @input="createCoverPreview = $event.target.value"
+                                   placeholder="https://images.unsplash.com/..." 
+                                   class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Gunakan URL Gambar</label>
-                        <input type="url" name="cover_url" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                    <div x-show="createCoverPreview" class="pt-2 border-t border-[#332C23] flex items-center gap-3">
+                        <img :src="createCoverPreview" class="w-12 h-16 object-cover rounded-lg border border-[#4D4336] bg-[#151311] shadow-xs" alt="Preview Sampul">
+                        <div>
+                            <span class="text-xs font-bold text-amber-300 block">Preview Sampul Terpilih</span>
+                            <span class="text-[10px] text-[#8E8070]">Gambar ini akan ditampilkan pada etalase katalog & rak 3D.</span>
+                        </div>
                     </div>
                 </div>
 
@@ -914,15 +934,32 @@
                             </div>
                         </div>
 
-                        <!-- Cover Image (Upload or URL) -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#26211A] p-3 rounded-2xl border border-[#3D352A]">
-                            <div>
-                                <label class="block text-xs font-semibold text-amber-300 mb-1">Ganti Berkas Sampul</label>
-                                <input type="file" name="cover_file" accept="image/*" class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
+                        <!-- Cover Image (Upload or URL) with Live Preview -->
+                        <div class="bg-[#26211A] p-3.5 rounded-2xl border border-[#3D352A] space-y-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-amber-300 mb-1">Ganti Berkas Sampul</label>
+                                    <input type="file" 
+                                           name="cover_file" 
+                                           accept="image/*" 
+                                           @change="const f = $event.target.files[0]; if (f) { editCoverPreview = URL.createObjectURL(f); }"
+                                           class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Ubah URL Gambar</label>
+                                    <input type="url" 
+                                           name="cover_url" 
+                                           x-model="selectedBook.cover_url" 
+                                           @input="editCoverPreview = $event.target.value"
+                                           class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Ubah URL Gambar</label>
-                                <input type="url" name="cover_url" x-model="selectedBook.cover_url" class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
+                            <div x-show="editCoverPreview" class="pt-2 border-t border-[#332C23] flex items-center gap-3">
+                                <img :src="editCoverPreview" class="w-12 h-16 object-cover rounded-lg border border-[#4D4336] bg-[#151311] shadow-xs" alt="Preview Sampul">
+                                <div>
+                                    <span class="text-xs font-bold text-amber-300 block">Preview Sampul Buku</span>
+                                    <span class="text-[10px] text-[#8E8070]">Tampilan terkini sampul buku yang tersimpan.</span>
+                                </div>
                             </div>
                         </div>
 

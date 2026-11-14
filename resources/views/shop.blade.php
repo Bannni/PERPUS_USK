@@ -7,6 +7,8 @@
     selectedBook: null,
     buyModalOpen: false,
     buyQuantity: 1,
+    previewModalOpen: false,
+    previewBook: null,
     get maxStock() {
         return (this.selectedBook && this.selectedBook.stock) ? Math.max(1, this.selectedBook.stock.quantity) : 1;
     },
@@ -14,6 +16,10 @@
         this.selectedBook = book;
         this.buyQuantity = 1;
         this.buyModalOpen = true;
+    },
+    openPreview(book) {
+        this.previewBook = book;
+        this.previewModalOpen = true;
     }
 }">
 
@@ -94,7 +100,9 @@
                 <div class="bg-white border border-[#EFE7DD] rounded-2xl p-3 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
                     <div>
                         <!-- Cover -->
-                        <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-sm border border-[#E9DFD2] bg-[#FAF7F2] relative">
+                        <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-sm border border-[#E9DFD2] bg-[#FAF7F2] relative cursor-pointer"
+                             @click="openPreview({{ json_encode($book) }})"
+                             title="Klik untuk melihat preview & rincian buku">
                             <img src="{{ $book->cover_url }}" 
                                  alt="{{ $book->title }}" 
                                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
@@ -104,8 +112,16 @@
                                 ★ {{ $book->rating }}
                             </div>
 
+                            <!-- Hover Overlay for Preview -->
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2">
+                                <span class="px-2.5 py-1 bg-white/95 text-[#4A3222] font-bold text-[11px] rounded-lg shadow-md flex items-center gap-1.5">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5 text-[#7A5034]"></i>
+                                    <span>Preview</span>
+                                </span>
+                            </div>
+
                             @if($isPurchased)
-                                <div class="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-2 text-center">
+                                <div class="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2 text-center z-10">
                                     <span class="px-2 py-1 bg-emerald-600 text-white font-bold text-[10px] rounded-lg shadow-md flex items-center gap-1">
                                         <i data-lucide="check" class="w-3 h-3"></i>
                                         <span>Sudah di Rak</span>
@@ -119,7 +135,9 @@
                             <span class="text-[9px] uppercase font-bold tracking-wider text-[#9C8B7E] block truncate">
                                 {{ $book->category }}
                             </span>
-                            <h3 class="font-bold text-xs sm:text-sm text-[#4A3222] group-hover:text-[#7A5034] transition line-clamp-1 mt-0.5" title="{{ $book->title }}">
+                            <h3 class="font-bold text-xs sm:text-sm text-[#4A3222] group-hover:text-[#7A5034] transition line-clamp-1 mt-0.5 cursor-pointer"
+                                @click="openPreview({{ json_encode($book) }})" 
+                                title="{{ $book->title }}">
                                 {{ $book->title }}
                             </h3>
                             <p class="text-[11px] text-[#8C7A6D] line-clamp-1">{{ $book->author }}</p>
@@ -330,6 +348,91 @@
                             </div>
                         </div>
                     @endauth
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- PREVIEW / DETAIL MODAL (QUICK PREVIEW BUKU) -->
+    <div x-show="previewModalOpen" 
+         x-cloak 
+         style="display: none;"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+         @keydown.escape.window="previewModalOpen = false">
+        
+        <div class="bg-[#FAF7F2] border border-[#E7DCCE] rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative"
+             @click.away="previewModalOpen = false">
+            
+            <button @click="previewModalOpen = false" class="absolute top-4 right-4 p-2 text-[#9C8B7E] hover:text-[#4A3222] rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <template x-if="previewBook">
+                <div>
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <!-- Cover -->
+                        <div class="w-32 sm:w-40 aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-[#DACBB8] bg-white shrink-0 mx-auto sm:mx-0">
+                            <img :src="previewBook.cover_url" 
+                                 :alt="previewBook.title" 
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';"
+                                 class="w-full h-full object-cover">
+                        </div>
+
+                        <!-- Details -->
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-[#9C6D47] bg-[#EFE4D6] px-2.5 py-0.5 rounded-full" x-text="previewBook.category"></span>
+                                <h3 class="font-serif text-xl sm:text-2xl font-bold text-[#4A3222] mt-2 leading-tight" x-text="previewBook.title"></h3>
+                                <p class="text-xs text-[#8C7A6D] mt-1" x-text="'Penulis: ' + previewBook.author"></p>
+
+                                <div class="mt-2 text-lg font-serif font-bold text-[#7A5034]" x-text="'Rp ' + Number(previewBook.price).toLocaleString('id-ID')"></div>
+
+                                <div class="flex items-center gap-3 mt-3 text-xs text-[#8C7A6D]">
+                                    <span class="flex items-center text-amber-600 font-bold gap-1">★ <span x-text="previewBook.rating"></span></span>
+                                    <span>•</span>
+                                    <span x-text="(previewBook.pages || 250) + ' Halaman'"></span>
+                                    <span>•</span>
+                                    <span x-text="'Tahun: ' + (previewBook.published_year || '-')"></span>
+                                </div>
+
+                                <div class="mt-3 text-[11px] text-[#7A6B60]">
+                                    Penerbit: <strong class="text-[#4A3222]" x-text="previewBook.publisher || 'Readowl'"></strong>
+                                </div>
+
+                                <div class="mt-2">
+                                    <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-md" 
+                                          x-text="'Stok Tersedia: ' + (previewBook.stock ? previewBook.stock.quantity : 0) + ' eksemplar'"></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <h4 class="text-xs font-bold uppercase text-[#8C7A6D] tracking-wider mb-1">Sinopsis & Ringkasan</h4>
+                                <p class="text-xs text-[#5D4F46] leading-relaxed line-clamp-5" x-text="previewBook.synopsis || previewBook.description || 'Tidak ada sinopsis tersedia.'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-[#E8DDCE] flex items-center justify-end gap-3">
+                        <button type="button" @click="previewModalOpen = false" class="px-4 py-2 text-xs font-semibold text-[#8C7A6D] hover:text-[#4A3222]">
+                            Tutup
+                        </button>
+                        
+                        <form action="{{ route('cart.store') }}" method="POST" class="inline">
+                            @csrf
+                            <input type="hidden" name="book_id" :value="previewBook.id">
+                            <button type="submit" class="px-4 py-2 bg-[#FAF7F2] hover:bg-[#EFE5D7] text-[#5F3D27] text-xs font-semibold rounded-xl border border-[#DACAB6] transition flex items-center gap-1.5">
+                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                                <span>+ Keranjang</span>
+                            </button>
+                        </form>
+
+                        <button type="button" 
+                                @click="previewModalOpen = false; openBuy(previewBook)" 
+                                class="px-5 py-2 bg-[#1C1815] hover:bg-black text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
+                            <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+                            <span>Beli Sekarang</span>
+                        </button>
+                    </div>
                 </div>
             </template>
         </div>
