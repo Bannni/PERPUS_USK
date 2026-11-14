@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rak Buku Virtual 3D - Readowl Bookstore (Live Demo)</title>
+    <title>My Library - Rak Buku Koleksi Saya</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,17 +31,15 @@
     <script src="./data.js"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF8F5; color: #2D231E; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF7F2; color: #2D231E; }
         .font-serif { font-family: 'Fraunces', serif; }
         [x-cloak] { display: none !important; }
 
         .shelf-container {
             position: relative;
-            padding-bottom: 28px;
-            margin-bottom: 40px;
         }
         .shelf-surface {
-            height: 12px;
+            height: 10px;
             background: linear-gradient(180deg, #F5ECE0 0%, #E9DECD 100%);
             border-top: 1px solid rgba(255, 255, 255, 0.9);
             border-radius: 4px 4px 0 0;
@@ -50,11 +48,11 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
         .shelf-face {
-            height: 16px;
+            height: 14px;
             background: linear-gradient(180deg, #DFD4C3 0%, #D2C4AF 100%);
             border-bottom: 2px solid #B8A892;
             border-radius: 0 0 6px 6px;
-            box-shadow: 0 14px 22px -3px rgba(60, 42, 28, 0.16), 0 4px 6px -2px rgba(60, 42, 28, 0.08);
+            box-shadow: 0 12px 18px -2px rgba(60, 42, 28, 0.14), 0 4px 6px -2px rgba(60, 42, 28, 0.08);
             position: relative;
             z-index: 4;
         }
@@ -66,221 +64,223 @@
             transform-origin: bottom center;
         }
         .book-wrapper:hover {
-            transform: translateY(-12px) scale(1.04) rotate(-1deg);
-            z-index: 25;
+            transform: translateY(-10px) scale(1.03);
+            z-index: 20;
+        }
+        .book-cover {
+            box-shadow: -4px 6px 14px rgba(45, 30, 20, 0.22), 0 2px 4px rgba(45, 30, 20, 0.12);
+            position: relative;
+            overflow: hidden;
+            border-radius: 3px 6px 6px 3px;
+        }
+        .book-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.2) 100%);
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased"
+<body class="min-h-screen bg-[#FAF7F2] text-[#2D231E]"
       x-data="{
-          activeShelf: 'all',
-          previewBook: null,
+          search: '',
+          selectedBook: null,
+          modalOpen: false,
           cartCount: READOWL_DATA.getCart().reduce((sum, item) => sum + item.quantity, 0),
+          get genres() {
+              const list = {};
+              READOWL_DATA.books.forEach(b => {
+                  if (this.search.trim()) {
+                      const q = this.search.toLowerCase();
+                      if (!b.title.toLowerCase().includes(q) && !b.author.toLowerCase().includes(q)) return;
+                  }
+                  if (!list[b.category]) list[b.category] = [];
+                  list[b.category].push(b);
+              });
+              return list;
+          },
+          openBook(book) {
+              this.selectedBook = book;
+              this.modalOpen = true;
+              this.$nextTick(() => lucide.createIcons());
+          },
           init() {
               window.addEventListener('cart-updated', (e) => {
                   this.cartCount = e.detail.reduce((sum, item) => sum + item.quantity, 0);
               });
               this.$nextTick(() => lucide.createIcons());
-          },
-          booksBySection(section) {
-              return READOWL_DATA.books.filter(b => b.shelf_section === section);
-          },
-          openBook(book) {
-              this.previewBook = book;
-              this.$nextTick(() => lucide.createIcons());
           }
       }">
 
-    <!-- Top Info Bar -->
-    <div class="bg-[#3D2719] text-[#FAF7F0] px-4 py-2 text-xs font-medium flex flex-wrap items-center justify-between gap-2 border-b border-[#7A5034]">
-        <div class="flex items-center gap-2">
-            <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span><strong>Live Interactive Demo</strong> di GitHub Pages &mdash; Rak Buku 3D Readowl</span>
-        </div>
-        <div class="flex items-center gap-4 text-amberWood-200">
-            <a href="https://github.com/Bannni/TO_USK" target="_blank" class="hover:text-white flex items-center gap-1 underline underline-offset-2">
-                <i data-lucide="github" class="w-3.5 h-3.5"></i>
-                <span>Repository Source Code</span>
-            </a>
-            <span class="text-amberWood-600">&bull;</span>
-            <a href="./admin.html" class="hover:text-white flex items-center gap-1 font-semibold text-amber-300">
-                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-                <span>Demo Admin Dashboard</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <header class="sticky top-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EFE7DD]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="./index.html" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-[#5F3D27] flex items-center justify-center text-amber-100 shadow-md group-hover:scale-105 transition-transform">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="font-serif text-2xl font-bold tracking-tight text-[#3D2719] block leading-none">Readowl</span>
-                    <span class="text-[10px] uppercase tracking-widest text-[#946645] font-semibold">Toko Buku & Kurasi</span>
-                </div>
+    <!-- Top Unified Navbar -->
+    <header class="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#EFE5D7]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-4 flex items-center justify-between">
+            <a href="./index.html" class="flex items-center gap-2.5">
+                <span class="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#4A3222]">READOWL</span>
             </a>
 
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#5F3D27]">
-                <a href="./index.html" class="hover:text-[#3D2719] transition-colors">Beranda</a>
-                <a href="./shop.html" class="hover:text-[#3D2719] transition-colors">Belanja</a>
-                <a href="./catalog.html" class="text-[#3D2719] font-bold border-b-2 border-[#946645] pb-1 flex items-center gap-1.5">
-                    <span>Rak Virtual 3D</span>
-                    <span class="px-1.5 py-0.5 text-[10px] bg-amber-100 text-[#7A5034] rounded-full font-bold">3D</span>
+            <div class="flex items-center gap-6 text-xs uppercase tracking-wider font-semibold text-[#73685E]">
+                <a href="./shop.html" class="hover:text-[#4A3222] transition text-[#7A5034]">Toko Buku</a>
+                <a href="./catalog.html" class="text-[#4A3222] font-bold">Rak Koleksi</a>
+                <a href="./cart.html" class="relative p-1.5 text-[#7A5034] hover:bg-[#E2DDD3] rounded-full transition">
+                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                    <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-1 -right-1 w-4 h-4 bg-[#7A5034] text-white rounded-full text-[9px] font-bold flex items-center justify-center"></span>
                 </a>
-                <a href="./about.html" class="hover:text-[#3D2719] transition-colors">Tentang Kami</a>
-                <a href="./contact.html" class="hover:text-[#3D2719] transition-colors">Kontak</a>
-                <a href="./admin.html" class="text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
-                    <span>Admin</span>
-                </a>
-            </nav>
-
-            <a href="./cart.html" class="relative p-2.5 rounded-xl text-[#3D2719] hover:bg-amberWood-100 transition-colors" title="Keranjang Belanja">
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-1 -right-1 bg-[#946645] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FAF8F5]"></span>
-            </a>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-        <div class="mb-10 text-center max-w-2xl mx-auto">
-            <span class="text-xs uppercase tracking-widest font-bold text-[#946645]">Visual Experience</span>
-            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#3D2719] mt-1">Lemari Rak Buku 3D</h1>
-            <p class="text-sm text-[#7A5034] mt-2">
-                Sentuh atau klik buku mana saja untuk melihat progress bacaan, sinopsis, atau langsung memasukkannya ke keranjang belanja Anda.
-            </p>
-        </div>
-
-        <!-- Shelf 1: Currently Reading -->
-        <div class="shelf-container">
-            <div class="flex items-center justify-between mb-4 px-2">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h2 class="font-serif text-xl font-bold text-[#3D2719]">Sedang Dibaca (Currently Reading)</h2>
+    <!-- MAIN BOOKCASE CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div>
+            <!-- Top Controls: Header and Search Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <!-- Info Label -->
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-[#5F3D27]">My Library (Rak Koleksi Buku)</h1>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#EFE5D7] text-[#7A5034] font-semibold">
+                            <span x-text="READOWL_DATA.books.length"></span> Buku Resmi Dikoleksi
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-[#8C7A6D] mt-1">Daftar buku fisik yang telah Anda beli dan tersusun rapi di rak 3D berdasarkan genrenya.</p>
                 </div>
-                <span class="text-xs font-semibold text-[#7A5034]">3 Judul Aktif</span>
+
+                <!-- Search & Shop Action -->
+                <div class="flex items-center gap-3">
+                    <div class="relative max-w-xs w-full">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8988B]"></i>
+                        <input type="text" 
+                               x-model="search"
+                               placeholder="Cari di rak saya..." 
+                               class="w-full pl-10 pr-4 py-2 bg-[#F1E8DC]/80 hover:bg-[#F1E8DC] focus:bg-white text-xs md:text-sm text-[#4A3222] placeholder-[#A8988B] rounded-xl border border-[#E4D7C5] focus:outline-none focus:ring-2 focus:ring-[#B0825B]/40 focus:border-[#B0825B] transition">
+                    </div>
+
+                    <a href="./shop.html" class="px-4 py-2 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Beli Buku Baru</span>
+                    </a>
+                </div>
             </div>
 
-            <div class="flex items-end justify-start sm:justify-center gap-4 sm:gap-8 overflow-x-auto pb-1 px-4 no-scrollbar">
-                <template x-for="book in booksBySection('currently_reading')" :key="book.id">
-                    <div class="book-wrapper cursor-pointer flex-shrink-0" @click="openBook(book)">
-                        <div class="w-24 sm:w-32 aspect-[2/3] rounded-r-md shadow-2xl overflow-hidden border-l-4 border-amber-950 relative group">
-                            <img :src="book.cover_url" :alt="book.title" class="w-full h-full object-cover">
-                            <!-- Progress Badge -->
-                            <div class="absolute bottom-0 inset-x-0 bg-black/70 backdrop-blur-sm px-2 py-1 text-center">
-                                <div class="w-full bg-gray-600 rounded-full h-1.5 overflow-hidden mb-1">
-                                    <div class="bg-amber-400 h-full rounded-full" :style="'width: ' + book.reading_progress + '%'"></div>
-                                </div>
-                                <span class="text-[10px] text-white font-bold" x-text="book.reading_progress + '% dibaca'"></span>
+            <!-- SHELVES VIEW (GROUPED BY GENRE / KATEGORI BUKU) -->
+            <div class="space-y-12">
+                <template x-for="(books, genre) in genres" :key="genre">
+                    <section class="shelf-container bg-white/60 border border-[#EBE1D3] rounded-3xl p-6 sm:p-8 shadow-xs">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full bg-[#B0825B]"></span>
+                                <h3 class="font-serif text-lg md:text-xl font-bold text-[#5F3D27] tracking-tight" x-text="'Genre: ' + genre"></h3>
                             </div>
+                            <span class="text-xs text-[#9C8B7E] font-medium"><span x-text="books.length"></span> buku dikoleksi</span>
                         </div>
-                        <p class="text-center font-serif text-xs font-bold text-[#3D2719] mt-2 max-w-[120px] truncate" x-text="book.title"></p>
-                    </div>
+
+                        <!-- Books On Genre Shelf -->
+                        <div class="relative pt-6 pb-0 px-4 md:px-8 flex items-end gap-6 sm:gap-8 md:gap-12 overflow-x-auto min-h-[210px] no-scrollbar">
+                            <template x-for="book in books" :key="book.id">
+                                <div class="book-wrapper cursor-pointer shrink-0 group" @click="openBook(book)">
+                                    <div class="w-24 sm:w-28 md:w-32 aspect-[2/3] book-cover bg-[#E9DECD] shadow-md group-hover:shadow-xl transition duration-300">
+                                        <img :src="book.cover_url" 
+                                             :alt="book.title" 
+                                             class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="text-center mt-2.5 w-24 sm:w-28 md:w-32">
+                                        <p class="text-[11px] font-semibold text-[#4A3222] truncate group-hover:text-[#7A5034] transition" x-text="book.title"></p>
+                                        <p class="text-[9px] text-[#8C7A6D] truncate" x-text="book.author"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- 3D Shelf Ledge -->
+                        <div class="shelf-surface mt-2"></div>
+                        <div class="shelf-face"></div>
+                    </section>
                 </template>
             </div>
-            <div class="shelf-surface"></div>
-            <div class="shelf-face"></div>
+
         </div>
 
-        <!-- Shelf 2: Next Up -->
-        <div class="shelf-container">
-            <div class="flex items-center justify-between mb-4 px-2">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                    <h2 class="font-serif text-xl font-bold text-[#3D2719]">Antrean Berikutnya (Next Up)</h2>
-                </div>
-                <span class="text-xs font-semibold text-[#7A5034]">4 Koleksi Pilihan</span>
+        <!-- Footer Notice -->
+        <div class="pt-8 mt-12 border-t border-[#EFE5D7] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9C8B7E] gap-2">
+            <p>&copy; 2026 Readowl Bookstore &bull; Toko Buku Resmi & Pengiriman ke Rumah</p>
+            <div class="flex items-center gap-4">
+                <a href="./shop.html" class="hover:text-[#5F3D27] font-semibold text-[#7A5034]">Toko Buku (Shop)</a>
+                <span>&bull;</span>
+                <a href="./index.html" class="hover:text-[#5F3D27] underline">Halaman Utama</a>
             </div>
-
-            <div class="flex items-end justify-start sm:justify-center gap-4 sm:gap-8 overflow-x-auto pb-1 px-4 no-scrollbar">
-                <template x-for="book in booksBySection('next_up')" :key="book.id">
-                    <div class="book-wrapper cursor-pointer flex-shrink-0" @click="openBook(book)">
-                        <div class="w-24 sm:w-32 aspect-[2/3] rounded-r-md shadow-2xl overflow-hidden border-l-4 border-amber-950">
-                            <img :src="book.cover_url" :alt="book.title" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-center font-serif text-xs font-bold text-[#3D2719] mt-2 max-w-[120px] truncate" x-text="book.title"></p>
-                    </div>
-                </template>
-            </div>
-            <div class="shelf-surface"></div>
-            <div class="shelf-face"></div>
-        </div>
-
-        <!-- Shelf 3: Finished -->
-        <div class="shelf-container">
-            <div class="flex items-center justify-between mb-4 px-2">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                    <h2 class="font-serif text-xl font-bold text-[#3D2719]">Selesai Dibaca (Finished)</h2>
-                </div>
-                <span class="text-xs font-semibold text-[#7A5034]">3 Judul Tuntas</span>
-            </div>
-
-            <div class="flex items-end justify-start sm:justify-center gap-4 sm:gap-8 overflow-x-auto pb-1 px-4 no-scrollbar">
-                <template x-for="book in booksBySection('finished')" :key="book.id">
-                    <div class="book-wrapper cursor-pointer flex-shrink-0" @click="openBook(book)">
-                        <div class="w-24 sm:w-32 aspect-[2/3] rounded-r-md shadow-2xl overflow-hidden border-l-4 border-amber-950 relative">
-                            <img :src="book.cover_url" :alt="book.title" class="w-full h-full object-cover">
-                            <span class="absolute top-2 right-2 bg-emerald-600 text-white rounded-full p-1 shadow">
-                                <i data-lucide="check" class="w-3 h-3"></i>
-                            </span>
-                        </div>
-                        <p class="text-center font-serif text-xs font-bold text-[#3D2719] mt-2 max-w-[120px] truncate" x-text="book.title"></p>
-                    </div>
-                </template>
-            </div>
-            <div class="shelf-surface"></div>
-            <div class="shelf-face"></div>
         </div>
     </main>
 
-    <!-- Book Detail Modal -->
-    <div x-cloak x-show="previewBook !== null"
-         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-         @keydown.escape.window="previewBook = null"
-         style="display: none;">
-        <div class="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-amberWood-300 relative"
-             @click.away="previewBook = null">
-            <button @click="previewBook = null" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700">
+    <!-- BOOK DETAIL MODAL -->
+    <div x-show="modalOpen" 
+         x-cloak
+         style="display: none;"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
+         @keydown.escape.window="modalOpen = false">
+        
+        <div class="bg-[#FAF7F2] border border-[#E7DBCB] rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden"
+             @click.away="modalOpen = false">
+            
+            <button @click="modalOpen = false" class="absolute top-4 right-4 p-2 text-[#9C8B7E] hover:text-[#4A3222] hover:bg-[#EFE5D7] rounded-full transition">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
 
-            <template x-if="previewBook">
-                <div class="space-y-4">
-                    <div class="flex gap-5">
-                        <img :src="previewBook.cover_url" :alt="previewBook.title" class="w-24 sm:w-32 aspect-[2/3] object-cover rounded-lg shadow-md border border-amberWood-200">
-                        <div class="flex-1">
-                            <span class="text-xs uppercase font-bold text-[#946645]" x-text="previewBook.category"></span>
-                            <h3 class="font-serif text-xl font-bold text-[#3D2719]" x-text="previewBook.title"></h3>
-                            <p class="text-xs text-[#7A5034]">oleh <span x-text="previewBook.author"></span></p>
-                            <p class="font-bold text-sm text-[#3D2719] mt-2" x-text="READOWL_DATA.formatRupiah(previewBook.price)"></p>
-                            <p class="text-xs text-emerald-700 mt-1">Stok tersedia: <span x-text="previewBook.stock"></span> eks</p>
+            <template x-if="selectedBook">
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <div class="w-36 sm:w-44 aspect-[2/3] shrink-0 mx-auto sm:mx-0 rounded-xl overflow-hidden shadow-lg border border-[#DACBB8] bg-[#E9DECD]">
+                        <img :src="selectedBook.cover_url" 
+                             :alt="selectedBook.title" 
+                             class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block text-[11px] font-bold uppercase tracking-wider text-[#9C6D47] bg-[#EFE4D6] px-2.5 py-0.5 rounded-full" x-text="'Genre: ' + selectedBook.category"></span>
+                            
+                            <h3 class="font-serif text-2xl font-bold text-[#4A3222] mt-2 leading-tight" x-text="selectedBook.title"></h3>
+                            <p class="text-sm text-[#7A6B60] mt-0.5 font-medium" x-text="'Penulis: ' + selectedBook.author"></p>
+
+                            <div class="flex items-center gap-4 mt-3 text-xs text-[#8C7A6D]">
+                                <div class="flex items-center text-amber-600 font-bold gap-1">
+                                    <span>&starf;</span>
+                                    <span x-text="selectedBook.rating"></span>
+                                </div>
+                                <span>&bull;</span>
+                                <span x-text="selectedBook.pages + ' Halaman'"></span>
+                                <span>&bull;</span>
+                                <span x-text="'Tahun: ' + (selectedBook.published_year || '-')"></span>
+                            </div>
+
+                            <div class="mt-4">
+                                <h4 class="text-xs font-bold uppercase text-[#8C7A6D] tracking-wider mb-1">Sinopsis</h4>
+                                <p class="text-xs text-[#5D4F46] leading-relaxed line-clamp-4" x-text="selectedBook.synopsis || selectedBook.description"></p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="bg-amberWood-50 p-3 rounded-xl border border-amberWood-200 text-xs">
-                        <span class="font-bold text-[#5F3D27] block mb-1">Sinopsis Singkat:</span>
-                        <p class="text-[#3D2719] leading-relaxed" x-text="previewBook.synopsis || previewBook.description"></p>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-3 pt-3">
-                        <button @click="READOWL_DATA.addToCart(previewBook); previewBook = null" class="px-5 py-2.5 rounded-xl bg-[#5F3D27] hover:bg-[#3D2719] text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
-                            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                            <span>Beli / Tambah ke Keranjang</span>
-                        </button>
+                        <div class="mt-6 pt-4 border-t border-[#E8DDCE] flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xs">
+                                <i data-lucide="package-check" class="w-4 h-4 text-emerald-700"></i>
+                                Buku Fisik Resmi Dimiliki
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <a href="./cart.html" class="px-4 py-2 bg-[#EFE4D6] hover:bg-[#E5D7C5] text-[#5F3D27] text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
+                                    <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                                    <span>Bukti Pembelian</span>
+                                </a>
+                                <button type="button" @click="modalOpen = false" class="px-4 py-2 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-bold rounded-xl shadow-xs transition">
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </template>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="mt-auto bg-[#3D2719] text-[#EFE7DD] py-8 border-t border-[#7A5034] text-center text-xs">
-        <p>&copy; 2026 Readowl Bookstore &bull; Rak Buku Virtual 3D</p>
-    </footer>
 </body>
 </html>
