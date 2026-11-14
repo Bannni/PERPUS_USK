@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readowl Bookstore - Temukan Inspirasi Membacamu (Live Demo)</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: {
+                            50: '#FDFBF7',
+                            100: '#FAF7F0',
+                            200: '#F5EFEB',
+                            300: '#EFE7DD',
+                            400: '#E2D5C4',
+                            500: '#D5C4AF',
+                        },
+                        amberWood: {
+                            50: '#FBF7F2',
+                            100: '#F4ECE1',
+                            200: '#E7D8C5',
+                            300: '#D7BEA2',
+                            400: '#C59E7A',
+                            500: '#B0825B',
+                            600: '#946645',
+                            700: '#7A5034',
+                            800: '#5F3D27',
+                            900: '#3D2719',
+                        },
+                        cocoa: {
+                            500: '#8C6747',
+                            600: '#724F33',
+                            700: '#593B23',
+                            800: '#3F2817',
+                            900: '#2A1A0F',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Shared Store -->
+    <script src="./data.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF8F5;
+            color: #2D231E;
+        }
+        .font-serif {
+            font-family: 'Fraunces', serif;
+        }
+        [x-cloak] { display: none !important; }
+        .shelf-surface {
+            height: 10px;
+            background: linear-gradient(180deg, #F5ECE0 0%, #E9DECD 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            z-index: 5;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+        .shelf-face {
+            height: 14px;
+            background: linear-gradient(180deg, #DFD4C3 0%, #D2C4AF 100%);
+            border-bottom: 2px solid #B8A892;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 12px 18px -2px rgba(60, 42, 28, 0.14), 0 4px 6px -2px rgba(60, 42, 28, 0.08);
+            position: relative;
+            z-index: 4;
+        }
+        .book-wrapper {
+            position: relative;
+            z-index: 10;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: bottom center;
+        }
+        .book-wrapper:hover {
+            transform: translateY(-8px) scale(1.02);
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amberWood-200 selection:text-amberWood-900"
+      x-data="{
+          cartCount: READOWL_DATA.getCart().reduce((sum, item) => sum + item.quantity, 0),
+          previewBook: null,
+          buyModal: { open: false, book: null, qty: 1, address: '', payment: 'qris' },
+          init() {
+              window.addEventListener('cart-updated', (e) => {
+                  this.cartCount = e.detail.reduce((sum, item) => sum + item.quantity, 0);
+              });
+              this.$nextTick(() => lucide.createIcons());
+          },
+          openPreview(book) {
+              this.previewBook = book;
+              this.$nextTick(() => lucide.createIcons());
+          },
+          openBuyModal(book) {
+              this.buyModal = {
+                  open: true,
+                  book: book,
+                  qty: 1,
+                  address: '',
+                  payment: 'qris'
+              };
+              this.$nextTick(() => lucide.createIcons());
+          },
+          submitDirectBuy() {
+              if (!this.buyModal.address.trim()) {
+                  alert('Harap isi alamat pengiriman dengan lengkap.');
+                  return;
+              }
+              alert('Terima kasih! Pesanan langsung untuk ' + this.buyModal.book.title + ' (' + this.buyModal.qty + ' buku) dengan metode ' + this.buyModal.payment.toUpperCase() + ' telah dibuat.');
+              this.buyModal.open = false;
+          }
+      }">
+
+    <!-- Top GitHub Pages Info Bar -->
+    <div class="bg-[#3D2719] text-[#FAF7F0] px-4 py-2 text-xs font-medium flex flex-wrap items-center justify-between gap-2 border-b border-[#7A5034]">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span><strong>Live Interactive Demo</strong> di GitHub Pages &mdash; Aplikasi Toko Buku Readowl (Uji Kompetensi Keahlian)</span>
+        </div>
+        <div class="flex items-center gap-4 text-amberWood-200">
+            <a href="https://github.com/Bannni/TO_USK" target="_blank" class="hover:text-white flex items-center gap-1 underline underline-offset-2">
+                <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                <span>Repository Source Code</span>
+            </a>
+            <span class="text-amberWood-600">&bull;</span>
+            <a href="./admin.html" class="hover:text-white flex items-center gap-1 font-semibold text-amber-300">
+                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                <span>Demo Admin Dashboard</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EFE7DD] transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="./index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-[#5F3D27] flex items-center justify-center text-amber-100 shadow-md group-hover:scale-105 transition-transform">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight text-[#3D2719] block leading-none">Readowl</span>
+                    <span class="text-[10px] uppercase tracking-widest text-[#946645] font-semibold">Toko Buku & Kurasi</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#5F3D27]">
+                <a href="./index.html" class="text-[#3D2719] font-bold border-b-2 border-[#946645] pb-1">Beranda</a>
+                <a href="./shop.html" class="hover:text-[#3D2719] transition-colors">Belanja</a>
+                <a href="./catalog.html" class="hover:text-[#3D2719] transition-colors flex items-center gap-1.5">
+                    <span>Rak Virtual 3D</span>
+                    <span class="px-1.5 py-0.5 text-[10px] bg-amber-100 text-[#7A5034] rounded-full font-bold">3D</span>
+                </a>
+                <a href="./about.html" class="hover:text-[#3D2719] transition-colors">Tentang Kami</a>
+                <a href="./contact.html" class="hover:text-[#3D2719] transition-colors">Kontak</a>
+                <a href="./admin.html" class="text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Admin</span>
+                </a>
+            </nav>
+
+            <!-- Actions: Cart & CTA -->
+            <div class="flex items-center gap-4">
+                <a href="./cart.html" class="relative p-2.5 rounded-xl text-[#3D2719] hover:bg-amberWood-100 transition-colors" title="Keranjang Belanja">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-1 -right-1 bg-[#946645] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#FAF8F5]"></span>
+                </a>
+                <a href="./shop.html" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#5F3D27] text-white text-sm font-semibold hover:bg-[#3D2719] transition-all shadow-sm hover:shadow-md">
+                    <span>Mulai Belanja</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden pt-12 pb-20 bg-gradient-to-b from-[#F5EFEB] to-[#FAF8F5]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <!-- Text Column -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amberWood-100 border border-amberWood-300 text-xs font-semibold text-[#7A5034]">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i>
+                        <span>Kurasi Buku Pilihan & Arsitektur Modern</span>
+                    </div>
+
+                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#3D2719] leading-tight font-bold">
+                        Temukan Inspirasi & Kedamaian Lewat Setiap Halaman.
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-[#5F3D27] leading-relaxed max-w-xl">
+                        Jelajahi karya fiksi, sains teknologi, dan pengembangan diri terkurasi. Dilengkapi rak virtual 3D interaktif dan sistem belanja terpadu.
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-4 pt-4">
+                        <a href="./shop.html" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#5F3D27] text-white font-semibold text-sm hover:bg-[#3D2719] transition-all shadow-md hover:shadow-lg">
+                            <i data-lucide="compass" class="w-4 h-4"></i>
+                            <span>Jelajahi Katalog Buku</span>
+                        </a>
+                        <a href="./catalog.html" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-[#D7BEA2] text-[#5F3D27] font-semibold text-sm hover:bg-[#F5EFEB] transition-all">
+                            <i data-lucide="box" class="w-4 h-4"></i>
+                            <span>Buka Rak Virtual 3D</span>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-6 pt-6 border-t border-amberWood-200">
+                        <div>
+                            <span class="block font-serif text-2xl font-bold text-[#3D2719]">100%</span>
+                            <span class="text-xs text-[#7A5034]">Buku Original</span>
+                        </div>
+                        <div>
+                            <span class="block font-serif text-2xl font-bold text-[#3D2719]">10+</span>
+                            <span class="text-xs text-[#7A5034]">Koleksi Unggulan</span>
+                        </div>
+                        <div>
+                            <span class="block font-serif text-2xl font-bold text-[#3D2719]">4.9 / 5</span>
+                            <span class="text-xs text-[#7A5034]">Rating Pembaca</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual 3D Showcase Column -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="relative w-full max-w-sm">
+                        <!-- Book Stack Card with Shadows -->
+                        <div class="bg-white p-6 rounded-2xl shadow-xl border border-amberWood-200 relative">
+                            <div class="relative aspect-[3/4] overflow-hidden rounded-xl shadow-lg mb-4 bg-amber-50">
+                                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80"
+                                     alt="The Year of Less"
+                                     class="w-full h-full object-cover">
+                                <span class="absolute top-3 left-3 bg-[#3D2719]/90 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-xs font-bold">
+                                    Editor's Pick
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-[#946645] uppercase tracking-wider">Self Improvement</span>
+                                <h3 class="font-serif text-xl font-bold text-[#3D2719] mt-1">The Year of Less</h3>
+                                <p class="text-xs text-[#7A5034]">oleh Cait Flanders</p>
+                                <div class="flex items-center justify-between mt-4 pt-3 border-t border-amberWood-100">
+                                    <span class="font-bold text-[#3D2719] text-lg">Rp 125.000</span>
+                                    <button @click="openPreview(READOWL_DATA.books[0])"
+                                            class="px-3.5 py-1.5 rounded-lg bg-[#5F3D27] text-white text-xs font-semibold hover:bg-[#3D2719] transition-all flex items-center gap-1.5">
+                                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                        <span>Preview Buku</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curated Books Section -->
+    <section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+            <div>
+                <span class="text-xs uppercase tracking-widest font-bold text-[#946645]">Pilihan Kurator</span>
+                <h2 class="font-serif text-3xl font-bold text-[#3D2719] mt-1">Buku Terpopuler Pekan Ini</h2>
+            </div>
+            <a href="./shop.html" class="mt-4 md:mt-0 text-sm font-semibold text-[#7A5034] hover:text-[#3D2719] flex items-center gap-1.5">
+                <span>Lihat Seluruh Koleksi</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+
+        <!-- Book Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <template x-for="book in READOWL_DATA.books.slice(0, 4)" :key="book.id">
+                <div class="bg-white rounded-2xl border border-amberWood-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group">
+                    <div class="relative aspect-[3/4] bg-amberWood-100 overflow-hidden cursor-pointer" @click="openPreview(book)">
+                        <img :src="book.cover_url" :alt="book.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 bg-[#3D2719]/80 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[11px] font-semibold" x-text="book.category"></span>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-1 text-amber-500 text-xs mb-1">
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                                <span class="font-bold text-[#3D2719]" x-text="book.rating"></span>
+                                <span class="text-gray-400">&bull; Stok: <strong x-text="book.stock"></strong></span>
+                            </div>
+                            <h3 class="font-serif font-bold text-[#3D2719] group-hover:text-[#946645] transition-colors line-clamp-1" x-text="book.title"></h3>
+                            <p class="text-xs text-[#7A5034] mt-0.5" x-text="book.author"></p>
+                        </div>
+
+                        <div class="pt-4 mt-4 border-t border-amberWood-100 flex items-center justify-between">
+                            <span class="font-bold text-[#3D2719]" x-text="READOWL_DATA.formatRupiah(book.price)"></span>
+                            <div class="flex items-center gap-1.5">
+                                <button @click="openPreview(book)" class="p-2 rounded-lg bg-amberWood-100 text-[#7A5034] hover:bg-amberWood-200 transition-colors" title="Preview Ringkasan">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                                <button @click="READOWL_DATA.addToCart(book)" class="p-2 rounded-lg bg-[#5F3D27] text-white hover:bg-[#3D2719] transition-colors" title="Tambah ke Keranjang">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
+
+    <!-- Bookshelf Ledge Visual Preview -->
+    <section class="py-14 bg-gradient-to-b from-[#FAF8F5] to-[#F5ECE0] border-y border-amberWood-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-xl mx-auto mb-10">
+                <span class="text-xs uppercase tracking-widest font-bold text-[#946645]">Fitur Unggulan</span>
+                <h2 class="font-serif text-3xl font-bold text-[#3D2719] mt-1">Pengalaman Rak Buku 3D Realistis</h2>
+                <p class="text-sm text-[#7A5034] mt-2">Rasakan sensasi mengambil buku dari lemari kayu bertekstur secara virtual langsung di browser.</p>
+            </div>
+
+            <div class="shelf-container max-w-4xl mx-auto pt-6">
+                <div class="flex items-end justify-center gap-6 sm:gap-10 pb-1">
+                    <template x-for="book in READOWL_DATA.books.slice(0, 5)" :key="book.id">
+                        <div class="book-wrapper cursor-pointer" @click="openPreview(book)">
+                            <div class="w-20 sm:w-28 aspect-[2/3] rounded-r-md shadow-2xl overflow-hidden border-l-4 border-amber-950">
+                                <img :src="book.cover_url" :alt="book.title" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <!-- Shelf wooden bars -->
+                <div class="shelf-surface"></div>
+                <div class="shelf-face"></div>
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="./catalog.html" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5F3D27] text-white text-sm font-semibold hover:bg-[#3D2719] transition-all shadow-md">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                    <span>Masuk ke Koleksi Rak 3D Lengkap</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-10 text-center max-w-xl mx-auto">
+            <span class="text-xs uppercase tracking-widest font-bold text-[#946645]">Eksplorasi Topik</span>
+            <h2 class="font-serif text-3xl font-bold text-[#3D2719] mt-1">Kategori Buku Populer</h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <template x-for="cat in READOWL_DATA.categories" :key="cat.id">
+                <a :href="'./shop.html?category=' + encodeURIComponent(cat.name)" class="bg-white p-5 rounded-xl border border-amberWood-200 text-center hover:border-[#946645] hover:shadow-md transition-all group">
+                    <div class="w-10 h-10 rounded-full bg-amberWood-100 text-[#7A5034] flex items-center justify-center mx-auto mb-3 group-hover:bg-[#5F3D27] group-hover:text-white transition-colors">
+                        <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="font-semibold text-xs sm:text-sm text-[#3D2719] group-hover:text-[#946645] transition-colors" x-text="cat.name"></h3>
+                    <p class="text-[11px] text-[#7A5034] mt-1"><span x-text="cat.count"></span> Judul</p>
+                </a>
+            </template>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#3D2719] text-[#EFE7DD] pt-14 pb-8 border-t border-[#7A5034]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-[#5F3D27]">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-[#5F3D27] flex items-center justify-center text-amber-200">
+                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-serif text-2xl font-bold text-white">Readowl</span>
+                    </div>
+                    <p class="text-xs text-amberWood-300 leading-relaxed">
+                        Aplikasi katalog dan penjualan buku terintegrasi berstandar Uji Sertifikasi Kompetensi (USK). Dibuat dengan arsitektur bersih dan pengalaman pengguna premium.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-serif font-bold text-white text-sm mb-4">Navigasi Halaman</h4>
+                    <ul class="space-y-2 text-xs text-amberWood-300">
+                        <li><a href="./index.html" class="hover:text-white transition-colors">Beranda Utama</a></li>
+                        <li><a href="./shop.html" class="hover:text-white transition-colors">Toko & Katalog Buku</a></li>
+                        <li><a href="./catalog.html" class="hover:text-white transition-colors">Rak Virtual 3D</a></li>
+                        <li><a href="./cart.html" class="hover:text-white transition-colors">Keranjang & Checkout</a></li>
+                        <li><a href="./admin.html" class="hover:text-white transition-colors">Dashboard Admin</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-serif font-bold text-white text-sm mb-4">Fitur Terpasang</h4>
+                    <ul class="space-y-2 text-xs text-amberWood-300">
+                        <li>&check; Filter Kategori & Pencarian Instan</li>
+                        <li>&check; Preview Modal Sinopsis Buku</li>
+                        <li>&check; Keranjang Checkbox & Validasi Alamat</li>
+                        <li>&check; Pembayaran Multi-Channel (QRIS/Bank)</li>
+                        <li>&check; Validasi Stok Maksimal</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-serif font-bold text-white text-sm mb-4">Pengembang</h4>
+                    <p class="text-xs text-amberWood-300 mb-3">Peserta USK Rekayasa Perangkat Lunak / Web Development.</p>
+                    <a href="https://github.com/Bannni/TO_USK" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5F3D27] hover:bg-[#7A5034] text-white text-xs font-semibold transition-all">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                        <span>Lihat Source Code di GitHub</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-amberWood-400 gap-4">
+                <p>&copy; 2026 Readowl Bookstore. Dilisensikan untuk Uji Kompetensi Keahlian.</p>
+                <div class="flex items-center gap-4">
+                    <a href="./about.html" class="hover:text-white">Tentang</a>
+                    <span>&bull;</span>
+                    <a href="./contact.html" class="hover:text-white">Kontak</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Book Preview Modal (Alpine) -->
+    <div x-cloak x-show="previewBook !== null"
+         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+         @keydown.escape.window="previewBook = null"
+         style="display: none;">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-amberWood-300 relative"
+             @click.away="previewBook = null">
+            <!-- Close Button -->
+            <button @click="previewBook = null" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <template x-if="previewBook">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-6">
+                    <div class="sm:col-span-5">
+                        <div class="aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-amberWood-200">
+                            <img :src="previewBook.cover_url" :alt="previewBook.title" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="sm:col-span-7 flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block px-2.5 py-1 rounded bg-amberWood-100 text-[#7A5034] text-xs font-bold uppercase tracking-wider" x-text="previewBook.category"></span>
+                            <h3 class="font-serif text-2xl font-bold text-[#3D2719] mt-2" x-text="previewBook.title"></h3>
+                            <p class="text-sm text-[#7A5034] font-medium mt-1">oleh <span x-text="previewBook.author"></span></p>
+
+                            <div class="flex items-center gap-3 text-xs text-[#5F3D27] mt-3 py-2 border-y border-amberWood-100">
+                                <span class="flex items-center gap-1 font-bold text-amber-600">
+                                    <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    <span x-text="previewBook.rating"></span>
+                                </span>
+                                <span>&bull;</span>
+                                <span>Tebal: <strong x-text="previewBook.pages"></strong> Hal</span>
+                                <span>&bull;</span>
+                                <span>Tahun: <strong x-text="previewBook.published_year"></strong></span>
+                            </div>
+
+                            <p class="text-xs text-[#5F3D27] leading-relaxed mt-4" x-text="previewBook.synopsis || previewBook.description"></p>
+                        </div>
+
+                        <div class="pt-6 mt-6 border-t border-amberWood-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-[#7A5034] block">Harga Resmi</span>
+                                <span class="font-serif text-xl font-bold text-[#3D2719]" x-text="READOWL_DATA.formatRupiah(previewBook.price)"></span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button @click="READOWL_DATA.addToCart(previewBook); previewBook = null" class="px-4 py-2 rounded-xl bg-amberWood-100 text-[#7A5034] hover:bg-amberWood-200 text-xs font-bold transition-colors">
+                                    + Keranjang
+                                </button>
+                                <button @click="openBuyModal(previewBook); previewBook = null" class="px-5 py-2 rounded-xl bg-[#5F3D27] text-white hover:bg-[#3D2719] text-xs font-bold transition-all shadow-sm">
+                                    Beli Sekarang
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Direct Buy Modal -->
+    <div x-cloak x-show="buyModal.open"
+         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+         @keydown.escape.window="buyModal.open = false"
+         style="display: none;">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-amberWood-300 relative"
+             @click.away="buyModal.open = false">
+            <button @click="buyModal.open = false" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-700">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <template x-if="buyModal.book">
+                <div>
+                    <h3 class="font-serif text-xl font-bold text-[#3D2719] mb-4">Konfirmasi Pembelian Langsung</h3>
+
+                    <!-- Book info summary -->
+                    <div class="flex gap-4 p-3 rounded-xl bg-amberWood-50 border border-amberWood-200 mb-5">
+                        <img :src="buyModal.book.cover_url" class="w-14 h-20 object-cover rounded-md shadow-sm">
+                        <div class="flex-1">
+                            <h4 class="font-serif font-bold text-sm text-[#3D2719]" x-text="buyModal.book.title"></h4>
+                            <p class="text-xs text-[#7A5034]" x-text="buyModal.book.author"></p>
+                            <p class="text-xs font-bold text-[#3D2719] mt-2" x-text="READOWL_DATA.formatRupiah(buyModal.book.price)"></p>
+                            <p class="text-[11px] text-amber-700 mt-0.5">Tersedia <span x-text="buyModal.book.stock"></span> stok</p>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Stepper with Max Stock Clamp -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-[#5F3D27] mb-1.5">Jumlah Buku (Maksimal Stok: <span x-text="buyModal.book.stock"></span>)</label>
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="if(buyModal.qty > 1) buyModal.qty--" class="w-9 h-9 rounded-lg border border-amberWood-300 flex items-center justify-center font-bold text-[#5F3D27] hover:bg-amberWood-100">-</button>
+                            <span class="w-12 text-center font-bold text-sm text-[#3D2719]" x-text="buyModal.qty"></span>
+                            <button type="button" @click="if(buyModal.qty < buyModal.book.stock) buyModal.qty++" class="w-9 h-9 rounded-lg border border-amberWood-300 flex items-center justify-center font-bold text-[#5F3D27] hover:bg-amberWood-100">+</button>
+                            <span class="text-xs text-[#7A5034] ml-2">Total: <strong x-text="READOWL_DATA.formatRupiah(buyModal.book.price * buyModal.qty)"></strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address Input -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-[#5F3D27] mb-1.5">Alamat Pengiriman Lengkap <span class="text-rose-500">*</span></label>
+                        <textarea x-model="buyModal.address" rows="2" placeholder="Masukkan jalan, nomor rumah, RT/RW, kota, kode pos..." class="w-full px-3 py-2 rounded-xl border border-amberWood-300 text-xs focus:ring-2 focus:ring-[#946645] focus:outline-none"></textarea>
+                    </div>
+
+                    <!-- Payment Method Radio Grid -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-[#5F3D27] mb-2">Metode Pembayaran</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'qris' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
+                                <input type="radio" value="qris" x-model="buyModal.payment" class="text-[#5F3D27] hidden">
+                                <span>📱 QRIS (Instant)</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'transfer_bank' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
+                                <input type="radio" value="transfer_bank" x-model="buyModal.payment" class="text-[#5F3D27] hidden">
+                                <span>🏦 Transfer Bank</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'ewallet' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
+                                <input type="radio" value="ewallet" x-model="buyModal.payment" class="text-[#5F3D27] hidden">
+                                <span>💳 E-Wallet</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'cod' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
+                                <input type="radio" value="cod" x-model="buyModal.payment" class="text-[#5F3D27] hidden">
+                                <span>📦 Bayar di Tempat (COD)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-amberWood-200">
+                        <button type="button" @click="buyModal.open = false" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#7A5034] hover:bg-gray-100">Batal</button>
+                        <button type="button" @click="submitDirectBuy()" class="px-6 py-2.5 rounded-xl bg-[#5F3D27] hover:bg-[#3D2719] text-white text-xs font-bold transition-all shadow-md">
+                            Bayar Sekarang
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</body>
+</html>
