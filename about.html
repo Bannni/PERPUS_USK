@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang Kami - Readowl Bookstore (Live Demo)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: { 50: '#FDFBF7', 100: '#FAF7F0', 200: '#F5EFEB', 300: '#EFE7DD', 400: '#E2D5C4', 500: '#D5C4AF' },
+                        amberWood: { 50: '#FBF7F2', 100: '#F4ECE1', 200: '#E7D8C5', 300: '#D7BEA2', 400: '#C59E7A', 500: '#B0825B', 600: '#946645', 700: '#7A5034', 800: '#5F3D27', 900: '#3D2719' },
+                    },
+                    fontFamily: {
+                        serif: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="./data.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF8F5; color: #2D231E; }
+        .font-serif { font-family: 'Fraunces', serif; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+    <!-- Top Info Bar -->
+    <div class="bg-[#3D2719] text-[#FAF7F0] px-4 py-2 text-xs font-medium flex flex-wrap items-center justify-between gap-2 border-b border-[#7A5034]">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span><strong>Live Interactive Demo</strong> di GitHub Pages &mdash; Tentang Readowl</span>
+        </div>
+        <div class="flex items-center gap-4 text-amberWood-200">
+            <a href="https://github.com/Bannni/TO_USK" target="_blank" class="hover:text-white flex items-center gap-1 underline underline-offset-2">
+                <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                <span>Repository Source Code</span>
+            </a>
+            <span class="text-amberWood-600">&bull;</span>
+            <a href="./admin.html" class="hover:text-white flex items-center gap-1 font-semibold text-amber-300">
+                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                <span>Demo Admin Dashboard</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EFE7DD]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="./index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-[#5F3D27] flex items-center justify-center text-amber-100 shadow-md group-hover:scale-105 transition-transform">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight text-[#3D2719] block leading-none">Readowl</span>
+                    <span class="text-[10px] uppercase tracking-widest text-[#946645] font-semibold">Toko Buku & Kurasi</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#5F3D27]">
+                <a href="./index.html" class="hover:text-[#3D2719] transition-colors">Beranda</a>
+                <a href="./shop.html" class="hover:text-[#3D2719] transition-colors">Belanja</a>
+                <a href="./catalog.html" class="hover:text-[#3D2719] transition-colors">Rak Virtual 3D</a>
+                <a href="./about.html" class="text-[#3D2719] font-bold border-b-2 border-[#946645] pb-1">Tentang Kami</a>
+                <a href="./contact.html" class="hover:text-[#3D2719] transition-colors">Kontak</a>
+                <a href="./admin.html" class="text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Admin</span>
+                </a>
+            </nav>
+
+            <a href="./shop.html" class="px-4 py-2 rounded-xl bg-[#5F3D27] text-white text-xs font-semibold hover:bg-[#3D2719]">
+                Mulai Belanja
+            </a>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-14">
+        <span class="text-xs uppercase tracking-widest font-bold text-[#946645]">Kisah Kami</span>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#3D2719] mt-2 mb-6">Tentang Readowl Bookstore</h1>
+
+        <div class="prose max-w-none text-[#5F3D27] space-y-5 text-sm sm:text-base leading-relaxed">
+            <p>
+                <strong>Readowl Bookstore</strong> didirikan dengan filosofi sederhana: bahwa buku bukan sekadar tumpukan kertas bertinta, melainkan pintu gerbang menuju pemikiran terbaik peradaban manusia.
+            </p>
+            <p>
+                Proyek ini dikembangkan sebagai karya uji kompetensi keahlian (USK) di bidang Rekayasa Perangkat Lunak / Web Development. Aplikasi ini memadukan arsitektur backend Laravel yang modular dan kuat dengan frontend interaktif yang estetis, ramah pengguna, dan berorientasi pada kepuasan pembaca.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-8 not-prose">
+                <div class="p-6 rounded-2xl bg-white border border-amberWood-200 shadow-sm">
+                    <h3 class="font-serif font-bold text-lg text-[#3D2719] mb-2">Visi Kami</h3>
+                    <p class="text-xs text-[#7A5034] leading-relaxed">
+                        Menjadi platform toko buku digital independen terdepan yang mengembalikan kecintaan membaca melalui pengalaman visual 3D yang imersif dan kurasi konten bermutu tinggi.
+                    </p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white border border-amberWood-200 shadow-sm">
+                    <h3 class="font-serif font-bold text-lg text-[#3D2719] mb-2">Misi Kami</h3>
+                    <p class="text-xs text-[#7A5034] leading-relaxed">
+                        Menyediakan akses mudah terhadap buku original, mendukung penerbit independen, dan menghadirkan kemudahan transaksi belanja digital yang aman dan cepat.
+                    </p>
+                </div>
+            </div>
+
+            <p>
+                Seluruh kode sumber aplikasi ini telah teruji dengan unit dan feature tests menyeluruh, siap ditinjau secara terbuka melalui repository GitHub kami.
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#3D2719] text-[#EFE7DD] py-8 border-t border-[#7A5034] text-center text-xs">
+        <p>&copy; 2026 Readowl Bookstore</p>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

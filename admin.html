@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Preview - Readowl Bookstore (Live Demo)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: { 50: '#FDFBF7', 100: '#FAF7F0', 200: '#F5EFEB', 300: '#EFE7DD', 400: '#E2D5C4', 500: '#D5C4AF' },
+                        amberWood: { 50: '#FBF7F2', 100: '#F4ECE1', 200: '#E7D8C5', 300: '#D7BEA2', 400: '#C59E7A', 500: '#B0825B', 600: '#946645', 700: '#7A5034', 800: '#5F3D27', 900: '#3D2719' },
+                    },
+                    fontFamily: {
+                        serif: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="./data.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF8F5; color: #2D231E; }
+        .font-serif { font-family: 'Fraunces', serif; }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex bg-gray-50 text-gray-800 antialiased"
+      x-data="{
+          activeTab: 'books',
+          booksList: [...READOWL_DATA.books],
+          ordersList: [
+              { id: 'ORD-948102', customer: 'Budi Santoso', book: 'The Year of Less (x1)', total: 125000, status: 'completed', payment: 'QRIS', date: '14 Nov 2026 14:20' },
+              { id: 'ORD-839210', customer: 'Siti Rahma', book: 'Clean Architecture (x2)', total: 420000, status: 'shipped', payment: 'Transfer Bank', date: '14 Nov 2026 11:05' },
+              { id: 'ORD-719301', customer: 'Ahmad Fauzi', book: 'Atomic Habits (x1)', total: 155000, status: 'processing', payment: 'E-Wallet', date: '14 Nov 2026 09:30' },
+              { id: 'ORD-602941', customer: 'Dewi Lestari', book: 'The Lord of the Rings (x1)', total: 240000, status: 'pending', payment: 'COD', date: '13 Nov 2026 18:45' }
+          ],
+          newBookModal: false,
+          newBook: { title: '', author: '', category: 'Self Improvement', price: 100000, stock: 10 },
+          deleteBook(id) {
+              if (confirm('Hapus buku ini dari database?')) {
+                  this.booksList = this.booksList.filter(b => b.id !== id);
+                  READOWL_DATA.showToast('Buku berhasil dihapus dari katalog admin.');
+              }
+          },
+          addBook() {
+              if (!this.newBook.title.trim()) {
+                  alert('Judul buku wajib diisi.');
+                  return;
+              }
+              const exists = this.booksList.some(b => b.title.toLowerCase() === this.newBook.title.trim().toLowerCase());
+              if (exists) {
+                  alert('Error: Judul buku tersebut sudah terdaftar! Gunakan judul lain.');
+                  return;
+              }
+              this.booksList.unshift({
+                  id: Date.now(),
+                  title: this.newBook.title,
+                  author: this.newBook.author || 'Penulis Baru',
+                  category: this.newBook.category,
+                  price: parseInt(this.newBook.price),
+                  stock: parseInt(this.newBook.stock),
+                  rating: 5.0,
+                  cover_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+                  pages: 200,
+                  published_year: 2026
+              });
+              this.newBookModal = false;
+              this.newBook = { title: '', author: '', category: 'Self Improvement', price: 100000, stock: 10 };
+              READOWL_DATA.showToast('Buku baru berhasil ditambahkan!');
+          },
+          updateOrderStatus(order, newStatus) {
+              order.status = newStatus;
+              READOWL_DATA.showToast('Status pesanan ' + order.id + ' diperbarui.');
+          },
+          init() {
+              this.$nextTick(() => lucide.createIcons());
+          }
+      }">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#3D2719] text-amberWood-200 flex flex-col min-h-screen border-r border-[#5F3D27] flex-shrink-0">
+        <div class="p-6 border-b border-[#5F3D27] flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-[#5F3D27] text-amber-200 flex items-center justify-center font-bold">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <span class="font-serif text-lg font-bold text-white block leading-none">Readowl Admin</span>
+                <span class="text-[10px] text-amberWood-400">Panel Manajemen USK</span>
+            </div>
+        </div>
+
+        <nav class="p-4 space-y-1.5 flex-1 text-xs font-semibold">
+            <button @click="activeTab = 'books'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
+                    :class="activeTab === 'books' ? 'bg-[#5F3D27] text-white shadow-sm' : 'hover:bg-white/5 text-amberWood-300'">
+                <i data-lucide="book" class="w-4 h-4"></i>
+                <span>Kelola Buku & Stok</span>
+            </button>
+
+            <button @click="activeTab = 'orders'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
+                    :class="activeTab === 'orders' ? 'bg-[#5F3D27] text-white shadow-sm' : 'hover:bg-white/5 text-amberWood-300'">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                <span>Status Pesanan</span>
+            </button>
+
+            <div class="pt-4 mt-4 border-t border-[#5F3D27]">
+                <a href="./index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-amberWood-300 hover:text-white hover:bg-white/5">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Kembali ke Website</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-[#5F3D27] text-[11px] text-amberWood-400">
+            <p>Admin Session: <strong>Superadmin</strong></p>
+            <p class="text-[10px] text-emerald-400 mt-0.5">&bull; Sistem Aktif Online</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <!-- Top bar -->
+        <header class="bg-white border-b border-gray-200 h-16 px-6 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded bg-amber-100 text-amber-800 text-xs font-bold">Interactive Admin Preview</span>
+                <span class="text-xs text-gray-500">Live Mockup BNSP / USK Web Development</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <span class="text-gray-500">Koneksi Database: <strong>Simulated LocalStore / GitHub Pages</strong></span>
+            </div>
+        </header>
+
+        <main class="p-6 sm:p-8 space-y-6">
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <span class="text-xs font-semibold text-gray-500">Total Buku Terdaftar</span>
+                    <h3 class="font-serif text-2xl font-bold text-gray-900 mt-1" x-text="booksList.length"></h3>
+                    <span class="text-[11px] text-emerald-600 font-medium">Stok sinkron</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <span class="text-xs font-semibold text-gray-500">Total Pesanan</span>
+                    <h3 class="font-serif text-2xl font-bold text-gray-900 mt-1" x-text="ordersList.length"></h3>
+                    <span class="text-[11px] text-emerald-600 font-medium">+1 pesanan hari ini</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <span class="text-xs font-semibold text-gray-500">Total Pendapatan</span>
+                    <h3 class="font-serif text-2xl font-bold text-gray-900 mt-1">Rp 940.000</h3>
+                    <span class="text-[11px] text-emerald-600 font-medium">Transaksional valid</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <span class="text-xs font-semibold text-gray-500">Pelanggan Aktif</span>
+                    <h3 class="font-serif text-2xl font-bold text-gray-900 mt-1">12</h3>
+                    <span class="text-[11px] text-emerald-600 font-medium">Terverifikasi</span>
+                </div>
+            </div>
+
+            <!-- Tab 1: Books Management -->
+            <div x-show="activeTab === 'books'" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                        <h2 class="font-serif text-lg font-bold text-gray-900">Koleksi Buku & Inventaris Stok</h2>
+                        <p class="text-xs text-gray-500">Data buku di Readowl beserta kontrol stok dan harga.</p>
+                    </div>
+                    <button @click="newBookModal = true" class="px-4 py-2 bg-[#5F3D27] text-white rounded-xl text-xs font-semibold hover:bg-[#3D2719] flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Tambah Buku</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase font-semibold">
+                            <tr>
+                                <th class="p-4">Buku</th>
+                                <th class="p-4">Kategori</th>
+                                <th class="p-4">Harga</th>
+                                <th class="p-4">Stok</th>
+                                <th class="p-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <template x-for="book in booksList" :key="book.id">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-4 flex items-center gap-3">
+                                        <img :src="book.cover_url" class="w-10 h-14 object-cover rounded shadow-sm">
+                                        <div>
+                                            <span class="font-bold text-gray-900 block" x-text="book.title"></span>
+                                            <span class="text-gray-500" x-text="book.author"></span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="px-2 py-1 rounded bg-amber-50 text-[#7A5034] font-semibold" x-text="book.category"></span>
+                                    </td>
+                                    <td class="p-4 font-bold text-gray-900" x-text="READOWL_DATA.formatRupiah(book.price)"></td>
+                                    <td class="p-4">
+                                        <span class="px-2 py-1 rounded font-bold" :class="book.stock > 10 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'">
+                                            <span x-text="book.stock"></span> eks
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-right space-x-2">
+                                        <button @click="deleteBook(book.id)" class="text-red-500 hover:text-red-700 font-semibold p-1" title="Hapus Buku">
+                                            <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 2: Orders Management -->
+            <div x-show="activeTab === 'orders'" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-gray-200">
+                    <h2 class="font-serif text-lg font-bold text-gray-900">Manajemen Status Transaksi</h2>
+                    <p class="text-xs text-gray-500">Ubah status pesanan pelanggan secara langsung.</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase font-semibold">
+                            <tr>
+                                <th class="p-4">Order ID & Waktu</th>
+                                <th class="p-4">Pelanggan</th>
+                                <th class="p-4">Item & Pembayaran</th>
+                                <th class="p-4">Total</th>
+                                <th class="p-4">Status Pesanan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <template x-for="ord in ordersList" :key="ord.id">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-4">
+                                        <strong class="text-gray-900 block" x-text="ord.id"></strong>
+                                        <span class="text-gray-400 text-[11px]" x-text="ord.date"></span>
+                                    </td>
+                                    <td class="p-4 font-semibold text-gray-800" x-text="ord.customer"></td>
+                                    <td class="p-4">
+                                        <span class="block text-gray-900" x-text="ord.book"></span>
+                                        <span class="text-[11px] text-gray-500" x-text="ord.payment"></span>
+                                    </td>
+                                    <td class="p-4 font-bold text-gray-900" x-text="READOWL_DATA.formatRupiah(ord.total)"></td>
+                                    <td class="p-4">
+                                        <select :value="ord.status" @change="updateOrderStatus(ord, $event.target.value)"
+                                                class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold focus:outline-none"
+                                                :class="{
+                                                    'bg-amber-50 text-amber-800 border-amber-300': ord.status === 'pending',
+                                                    'bg-blue-50 text-blue-800 border-blue-300': ord.status === 'processing',
+                                                    'bg-purple-50 text-purple-800 border-purple-300': ord.status === 'shipped',
+                                                    'bg-emerald-50 text-emerald-800 border-emerald-300': ord.status === 'completed'
+                                                }">
+                                            <option value="pending">Menunggu Pembayaran</option>
+                                            <option value="processing">Sedang Diproses</option>
+                                            <option value="shipped">Sedang Dikirim</option>
+                                            <option value="completed">Pesanan Selesai</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Book Modal -->
+    <div x-cloak x-show="newBookModal"
+         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+         style="display: none;">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
+            <h3 class="font-serif text-lg font-bold text-gray-900 mb-4">Tambah Buku Baru</h3>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Judul Buku (Harus Unik)</label>
+                    <input type="text" x-model="newBook.title" placeholder="e.g. Belajar Laravel 12 Komprehensif" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#946645]">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Penulis</label>
+                    <input type="text" x-model="newBook.author" placeholder="e.g. John Doe" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#946645]">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Kategori</label>
+                    <select x-model="newBook.category" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#946645]">
+                        <option value="Self Improvement">Self Improvement</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Design & UX">Design & UX</option>
+                        <option value="Fantasy & Fiction">Fantasy & Fiction</option>
+                        <option value="Classic & Philosophy">Classic & Philosophy</option>
+                        <option value="Travel & Photography">Travel & Photography</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Harga (IDR)</label>
+                        <input type="number" x-model="newBook.price" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#946645]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Stok Awal</label>
+                        <input type="number" x-model="newBook.stock" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#946645]">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+                <button @click="newBookModal = false" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
+                <button @click="addBook()" class="px-5 py-2 text-xs font-bold bg-[#5F3D27] text-white rounded-lg hover:bg-[#3D2719]">Simpan Buku</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

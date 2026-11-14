@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontak Kami - Readowl Bookstore (Live Demo)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: { 50: '#FDFBF7', 100: '#FAF7F0', 200: '#F5EFEB', 300: '#EFE7DD', 400: '#E2D5C4', 500: '#D5C4AF' },
+                        amberWood: { 50: '#FBF7F2', 100: '#F4ECE1', 200: '#E7D8C5', 300: '#D7BEA2', 400: '#C59E7A', 500: '#B0825B', 600: '#946645', 700: '#7A5034', 800: '#5F3D27', 900: '#3D2719' },
+                    },
+                    fontFamily: {
+                        serif: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="./data.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF8F5; color: #2D231E; }
+        .font-serif { font-family: 'Fraunces', serif; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased"
+      x-data="{
+          form: { name: '', email: '', message: '' },
+          submitted: false,
+          send() {
+              if(!this.form.name || !this.form.email || !this.form.message) {
+                  alert('Harap lengkapi semua bidang isian.');
+                  return;
+              }
+              this.submitted = true;
+          }
+      }">
+    <!-- Top Info Bar -->
+    <div class="bg-[#3D2719] text-[#FAF7F0] px-4 py-2 text-xs font-medium flex flex-wrap items-center justify-between gap-2 border-b border-[#7A5034]">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span><strong>Live Interactive Demo</strong> di GitHub Pages &mdash; Hubungi Readowl</span>
+        </div>
+        <div class="flex items-center gap-4 text-amberWood-200">
+            <a href="https://github.com/Bannni/TO_USK" target="_blank" class="hover:text-white flex items-center gap-1 underline underline-offset-2">
+                <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                <span>Repository Source Code</span>
+            </a>
+            <span class="text-amberWood-600">&bull;</span>
+            <a href="./admin.html" class="hover:text-white flex items-center gap-1 font-semibold text-amber-300">
+                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                <span>Demo Admin Dashboard</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EFE7DD]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="./index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-[#5F3D27] flex items-center justify-center text-amber-100 shadow-md group-hover:scale-105 transition-transform">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight text-[#3D2719] block leading-none">Readowl</span>
+                    <span class="text-[10px] uppercase tracking-widest text-[#946645] font-semibold">Toko Buku & Kurasi</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#5F3D27]">
+                <a href="./index.html" class="hover:text-[#3D2719] transition-colors">Beranda</a>
+                <a href="./shop.html" class="hover:text-[#3D2719] transition-colors">Belanja</a>
+                <a href="./catalog.html" class="hover:text-[#3D2719] transition-colors">Rak Virtual 3D</a>
+                <a href="./about.html" class="hover:text-[#3D2719] transition-colors">Tentang Kami</a>
+                <a href="./contact.html" class="text-[#3D2719] font-bold border-b-2 border-[#946645] pb-1">Kontak</a>
+                <a href="./admin.html" class="text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Admin</span>
+                </a>
+            </nav>
+
+            <a href="./shop.html" class="px-4 py-2 rounded-xl bg-[#5F3D27] text-white text-xs font-semibold hover:bg-[#3D2719]">
+                Mulai Belanja
+            </a>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-14 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+            <div class="md:col-span-5 space-y-6">
+                <div>
+                    <span class="text-xs uppercase tracking-widest font-bold text-[#946645]">Layanan Pelanggan</span>
+                    <h1 class="font-serif text-3xl font-bold text-[#3D2719] mt-1">Hubungi Kami</h1>
+                    <p class="text-xs text-[#7A5034] mt-2 leading-relaxed">
+                        Punya pertanyaan seputar ketersediaan buku, kemitraan penerbit, atau kendala pesanan? Tim kami siap membantu Anda.
+                    </p>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-amberWood-200">
+                        <div class="w-9 h-9 rounded-lg bg-amberWood-100 text-[#7A5034] flex items-center justify-center">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block text-[11px]">Surel Elektronik</span>
+                            <span class="font-bold text-[#3D2719]">halo@readowl.store</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-amberWood-200">
+                        <div class="w-9 h-9 rounded-lg bg-amberWood-100 text-[#7A5034] flex items-center justify-center">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block text-[11px]">Lokasi Toko Fisik</span>
+                            <span class="font-bold text-[#3D2719]">Kebayoran Baru, Jakarta Selatan</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-amberWood-200">
+                        <div class="w-9 h-9 rounded-lg bg-amberWood-100 text-[#7A5034] flex items-center justify-center">
+                            <i data-lucide="clock" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block text-[11px]">Jam Layanan</span>
+                            <span class="font-bold text-[#3D2719]">Setiap Hari (08.00 - 21.00 WIB)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="md:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-amberWood-200 shadow-sm">
+                <template x-if="!submitted">
+                    <form @submit.prevent="send()" class="space-y-4 text-xs">
+                        <h3 class="font-serif text-lg font-bold text-[#3D2719]">Kirim Pesan</h3>
+
+                        <div>
+                            <label class="block font-bold text-[#5F3D27] mb-1">Nama Lengkap</label>
+                            <input type="text" x-model="form.name" placeholder="Nama Anda" class="w-full px-3 py-2 rounded-xl border border-amberWood-300 focus:ring-2 focus:ring-[#946645] focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-[#5F3D27] mb-1">Alamat Email</label>
+                            <input type="email" x-model="form.email" placeholder="email@domain.com" class="w-full px-3 py-2 rounded-xl border border-amberWood-300 focus:ring-2 focus:ring-[#946645] focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-[#5F3D27] mb-1">Isi Pesan / Saran</label>
+                            <textarea x-model="form.message" rows="4" placeholder="Tuliskan pertanyaan Anda..." class="w-full px-3 py-2 rounded-xl border border-amberWood-300 focus:ring-2 focus:ring-[#946645] focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-[#5F3D27] text-white font-bold rounded-xl hover:bg-[#3D2719] transition-all shadow-md">
+                            Kirim Pesan Sekarang
+                        </button>
+                    </form>
+                </template>
+
+                <template x-if="submitted">
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-[#3D2719]">Pesan Terkirim!</h3>
+                        <p class="text-xs text-[#7A5034] mt-1">Terima kasih atas pesan Anda. Kami akan segera membalas ke email Anda.</p>
+                        <button @click="submitted = false; form = { name: '', email: '', message: '' }" class="mt-4 px-4 py-2 rounded-xl bg-amberWood-100 text-[#7A5034] text-xs font-semibold hover:bg-amberWood-200">
+                            Kirim Pesan Lain
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#3D2719] text-[#EFE7DD] py-8 border-t border-[#7A5034] text-center text-xs">
+        <p>&copy; 2026 Readowl Bookstore</p>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
