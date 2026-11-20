@@ -363,22 +363,18 @@
 
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-[#5F3D27] mb-2">Metode Pembayaran</label>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="grid grid-cols-3 gap-2 text-xs">
                             <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'qris' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
                                 <input type="radio" value="qris" x-model="buyModal.payment" class="hidden">
-                                <span>📱 QRIS (Instant)</span>
+                                <span>📱 QRIS</span>
                             </label>
                             <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'transfer_bank' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
                                 <input type="radio" value="transfer_bank" x-model="buyModal.payment" class="hidden">
-                                <span>🏦 Transfer Bank</span>
+                                <span>🏦 Transfer</span>
                             </label>
                             <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'ewallet' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
                                 <input type="radio" value="ewallet" x-model="buyModal.payment" class="hidden">
                                 <span>💳 E-Wallet</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer" :class="buyModal.payment === 'cod' ? 'border-[#5F3D27] bg-amberWood-100 font-bold' : 'border-amberWood-200'">
-                                <input type="radio" value="cod" x-model="buyModal.payment" class="hidden">
-                                <span>📦 Bayar di Tempat (COD)</span>
                             </label>
                         </div>
                     </div>

@@ -78,7 +78,7 @@
                             :class="activeTab === 'orders' ? 'bg-amber-400 text-[#151311] font-bold shadow-sm' : 'text-[#A69785] hover:text-white'"
                             class="px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 shrink-0">
                         <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Pesanan & COD</span>
+                        <span class="hidden sm:inline">Pesanan Masuk</span>
                         <span class="text-[10px] opacity-80">({{ $totalOrders }})</span>
                     </button>
 
@@ -452,7 +452,7 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 pb-4 border-b border-[#2E2820] gap-4">
                     <div>
                         <h2 class="font-serif text-xl sm:text-2xl font-bold text-white">Log Transaksi & Pengubahan Status Pesanan</h2>
-                        <p class="text-xs text-[#8E8070] mt-0.5">Pantau pesanan dari user (order_code, shipping_address, COD) dan ubah status pengiriman.</p>
+                        <p class="text-xs text-[#8E8070] mt-0.5">Pantau pesanan dari user (order_code, shipping_address, metode pembayaran) dan ubah status pengiriman.</p>
                     </div>
                     <div class="text-right">
                         <span class="text-[10px] text-[#8E8070] block uppercase">Total Omzet Transaksi</span>
@@ -468,7 +468,7 @@
                                     <th class="pb-3 px-3">Kode Pesanan</th>
                                     <th class="pb-3 px-3">Pembeli & No. Telepon</th>
                                     <th class="pb-3 px-3">Rincian Buku</th>
-                                    <th class="pb-3 px-3">Alamat Kirim (COD)</th>
+                                    <th class="pb-3 px-3">Alamat Kirim</th>
                                     <th class="pb-3 px-3">Total Harga</th>
                                     <th class="pb-3 px-3">Ubah Status Pengiriman (BNSP)</th>
                                     <th class="pb-3 px-3">Waktu</th>
@@ -501,7 +501,7 @@
                                         </td>
                                         <td class="py-4 px-3 max-w-xs">
                                             <div class="text-[11px] text-[#D4C7B8] line-clamp-2" title="{{ $order->shipping_address }}">
-                                                {{ $order->shipping_address ?? 'Pengiriman COD alamat terdaftar' }}
+                                                {{ $order->shipping_address ?? 'Alamat pengiriman terdaftar' }}
                                             </div>
                                             <span class="text-[9px] uppercase font-bold text-amber-300/80 mt-0.5 block">
                                                 Metode: {{ $order->payment_method }}

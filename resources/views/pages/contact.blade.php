@@ -42,7 +42,7 @@
                         Kirim Pesan & Pertanyaan Anda
                     </h1>
                     <p class="text-xs sm:text-sm text-[#7A6B60] mt-3 leading-relaxed">
-                        Apakah Anda ingin menanyakan ketersediaan judul buku, konfirmasi status pesanan COD, atau memberi kritik dan saran? Silakan isi formulir berikut.
+                        Apakah Anda ingin menanyakan ketersediaan judul buku, konfirmasi status pesanan, atau memberi kritik dan saran? Silakan isi formulir berikut.
                     </p>
                 </div>
 
@@ -63,7 +63,7 @@
                             <i data-lucide="phone" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-[#9C8B7E] block">Layanan WhatsApp / COD</span>
+                            <span class="text-[10px] uppercase font-bold text-[#9C8B7E] block">Layanan WhatsApp / CS</span>
                             <span class="text-xs font-semibold text-[#4A3222]">+62 812-3456-7890</span>
                         </div>
                     </div>

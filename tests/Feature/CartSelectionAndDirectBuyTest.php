@@ -76,7 +76,7 @@ class CartSelectionAndDirectBuyTest extends TestCase
         $response->assertSee('QRIS (Instant)');
         $response->assertSee('Transfer Bank BCA/Mandiri');
         $response->assertSee('E-Wallet GoPay/OVO');
-        $response->assertSee('Payment at Delivery (COD)');
+        $response->assertDontSee('Payment at Delivery (COD)');
     }
 
     /**

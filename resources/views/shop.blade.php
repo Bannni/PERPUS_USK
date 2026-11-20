@@ -290,7 +290,6 @@
                                         <option value="QRIS (Instant)">QRIS (Instant)</option>
                                         <option value="Transfer Bank BCA/Mandiri">Transfer Bank BCA / Mandiri</option>
                                         <option value="E-Wallet GoPay/OVO">E-Wallet (GoPay / OVO)</option>
-                                        <option value="Payment at Delivery (COD)">Payment at Delivery (COD)</option>
                                     </select>
                                 </div>
                             </div>

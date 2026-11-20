@@ -279,19 +279,6 @@
                                         </div>
                                     </div>
                                 </label>
-
-                                <label class="p-3 rounded-2xl border-2 border-[#E0D5C7] has-checked:border-[#7A5034] has-checked:bg-[#FAF7F2] flex items-center justify-between cursor-pointer transition">
-                                    <div class="flex items-center gap-2.5">
-                                        <input type="radio" 
-                                               name="payment_method" 
-                                               value="Payment at Delivery (COD)" 
-                                               class="w-4 h-4 text-[#7A5034] focus:ring-[#7A5034]">
-                                        <div>
-                                            <span class="text-xs font-bold text-[#4A3222] block">Payment at Delivery (COD)</span>
-                                            <span class="text-[10px] text-[#7A6B60] block">Bayar tunai di tempat saat kurir menyerahkan buku</span>
-                                        </div>
-                                    </div>
-                                </label>
                             </div>
                         </div>
 
@@ -350,7 +337,7 @@
     <!-- FOOTER -->
     <footer class="border-t border-[#EFE5D7] bg-[#FAF7F2] py-8 text-xs text-[#9C8B7E]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p>© 2026 Readowl Bookstore • Modul Keranjang Belanja & Checkout COD</p>
+            <p>© 2026 Readowl Bookstore • Modul Keranjang Belanja & Checkout</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('home') }}" class="hover:text-[#5F3D27]">Beranda</a>
                 <span>•</span>

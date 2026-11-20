@@ -47,7 +47,7 @@
                 </div>
 
                 <p class="text-xs sm:text-sm text-[#7A6B60] leading-relaxed">
-                    Kami percaya bahwa toko buku tidak sekadar tempat bertransaksi, melainkan ruang inspirasi tempat bertemunya ide-ide brilian dari berbagai penjuru dunia. Melalui Readowl, Anda dapat menemukan buku terbitan lokal dan internasional dengan jaminan keaslian dan pelayanan pengiriman langsung di tempat (<em>Payment at Delivery / COD</em>).
+                    Kami percaya bahwa toko buku tidak sekadar tempat bertransaksi, melainkan ruang inspirasi tempat bertemunya ide-ide brilian dari berbagai penjuru dunia. Melalui Readowl, Anda dapat menemukan buku terbitan lokal dan internasional dengan jaminan keaslian dan pelayanan pengiriman langsung ke alamat tujuan Anda.
                 </p>
 
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-[#EFE5D7]">
@@ -73,11 +73,11 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="space-y-2">
                     <div class="w-12 h-12 rounded-2xl bg-[#EFE4D6] text-[#7A5034] flex items-center justify-center font-bold">
-                        <i data-lucide="truck" class="w-6 h-6"></i>
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
                     </div>
-                    <h4 class="font-serif font-bold text-lg text-[#4A3222]">Payment at Delivery (COD)</h4>
+                    <h4 class="font-serif font-bold text-lg text-[#4A3222]">Pembayaran Digital Terpercaya</h4>
                     <p class="text-xs text-[#7A6B60] leading-relaxed">
-                        Nikmati kemudahan berbelanja buku dengan sistem pembayaran di tempat saat paket buku telah tiba di alamat tujuan Anda.
+                        Nikmati kemudahan berbelanja buku dengan pembayaran terverifikasi aman melalui QRIS instan, Transfer Bank, dan E-Wallet.
                     </p>
                 </div>
 
