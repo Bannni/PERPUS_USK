@@ -229,13 +229,45 @@ class CartSelectionAndDirectBuyTest extends TestCase
             'category_id' => $category->id,
             'price' => 90000,
             'stock_quantity' => 10,
+            'cover_url' => 'https://images.unsplash.com/photo-1544947950-fa07a98d237f',
         ]);
 
         $response->assertSessionHasErrors(['title']);
     }
 
     /**
-     * 9. Admin can update book keeping its own title, but cannot use another existing book's title.
+     * 9. Admin must provide a cover image (file or URL) when adding a new book.
+     */
+    public function test_admin_must_provide_cover_image_on_create()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = Category::first();
+
+        // Submitting with NO image fails
+        $responseFail = $this->actingAs($admin)->post(route('admin.books.store'), [
+            'title' => 'Buku Baru Tanpa Sampul',
+            'author' => 'Penulis',
+            'category_id' => $category->id,
+            'price' => 50000,
+            'stock_quantity' => 5,
+        ]);
+        $responseFail->assertSessionHasErrors(['cover_url', 'cover_file']);
+
+        // Submitting WITH cover_url succeeds
+        $responseSuccess = $this->actingAs($admin)->post(route('admin.books.store'), [
+            'title' => 'Buku Baru Dengan Sampul',
+            'author' => 'Penulis',
+            'category_id' => $category->id,
+            'price' => 50000,
+            'stock_quantity' => 5,
+            'cover_url' => 'https://images.unsplash.com/photo-1544947950-fa07a98d237f',
+        ]);
+        $responseSuccess->assertRedirect(route('admin.dashboard', ['tab' => 'books']));
+        $this->assertDatabaseHas('books', ['title' => 'Buku Baru Dengan Sampul']);
+    }
+
+    /**
+     * 10. Admin can update book keeping its own title, but cannot use another existing book's title.
      */
     public function test_admin_title_unique_rule_on_update()
     {

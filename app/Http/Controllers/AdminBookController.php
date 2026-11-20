@@ -161,8 +161,8 @@ class AdminBookController extends Controller
             'category' => ['required', 'string', 'max:100'],
             'shelf_section' => ['nullable', 'in:currently_reading,next_up,finished'],
             'price' => ['required', 'integer', 'min:0'],
-            'cover_url' => ['nullable', 'string', 'max:500'],
-            'cover_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
+            'cover_url' => ['required_without:cover_file', 'nullable', 'string', 'max:500'],
+            'cover_file' => ['required_without:cover_url', 'nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
             'rating' => ['nullable', 'numeric', 'min:1', 'max:5'],
             'pages' => ['nullable', 'integer', 'min:1'],
             'published_year' => ['nullable', 'integer', 'min:1800', 'max:' . (date('Y') + 1)],
@@ -173,13 +173,16 @@ class AdminBookController extends Controller
             'author.required' => 'Nama penulis wajib diisi.',
             'category.required' => 'Kategori / Genre wajib diisi.',
             'price.required' => 'Harga buku wajib diisi.',
+            'cover_url.required_without' => 'Gambar sampul buku wajib ditambahkan (unggah file gambar atau masukkan URL gambar).',
+            'cover_file.required_without' => 'Gambar sampul buku wajib ditambahkan (unggah file gambar atau masukkan URL gambar).',
+            'cover_file.image' => 'Berkas sampul harus berupa gambar yang valid (JPEG, PNG, JPG, WebP).',
+            'cover_file.mimes' => 'Format gambar yang diperbolehkan: JPEG, PNG, JPG, WebP.',
+            'cover_file.max' => 'Ukuran berkas gambar maksimal 4MB.',
         ]);
 
         if ($request->hasFile('cover_file')) {
             $path = $request->file('cover_file')->store('covers', 'public');
             $validated['cover_url'] = '/storage/' . $path;
-        } elseif (empty($validated['cover_url'])) {
-            $validated['cover_url'] = 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';
         }
 
         $validated['shelf_section'] = $validated['shelf_section'] ?? 'next_up';

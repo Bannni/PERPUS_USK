@@ -32,8 +32,8 @@ class BookController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'price' => ['required', 'integer', 'min:0'],
             'stock_quantity' => ['required', 'integer', 'min:0'],
-            'cover_url' => ['nullable', 'string', 'max:500'],
-            'cover_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
+            'cover_url' => ['required_without:cover_file', 'nullable', 'string', 'max:500'],
+            'cover_file' => ['required_without:cover_url', 'nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
             'rating' => ['nullable', 'numeric', 'min:1', 'max:5'],
             'pages' => ['nullable', 'integer', 'min:1'],
             'published_year' => ['nullable', 'integer', 'min:1800', 'max:' . (date('Y') + 1)],
@@ -45,6 +45,11 @@ class BookController extends Controller
             'category_id.required' => 'Kategori buku wajib dipilih.',
             'price.required' => 'Harga buku wajib diisi.',
             'stock_quantity.required' => 'Jumlah stok buku wajib diisi.',
+            'cover_url.required_without' => 'Gambar sampul buku wajib ditambahkan (unggah file gambar atau masukkan URL gambar).',
+            'cover_file.required_without' => 'Gambar sampul buku wajib ditambahkan (unggah file gambar atau masukkan URL gambar).',
+            'cover_file.image' => 'Berkas sampul harus berupa gambar yang valid (JPEG, PNG, JPG, WebP).',
+            'cover_file.mimes' => 'Format gambar yang diperbolehkan: JPEG, PNG, JPG, WebP.',
+            'cover_file.max' => 'Ukuran berkas gambar maksimal 4MB.',
         ]);
 
         if ($request->hasFile('cover_file')) {
@@ -53,10 +58,6 @@ class BookController extends Controller
             $validated['cover_url'] = '/storage/' . $path;
         } elseif (!empty($validated['cover_url'])) {
             $validated['cover_image'] = $validated['cover_url'];
-        } else {
-            $defaultCover = 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80';
-            $validated['cover_image'] = $defaultCover;
-            $validated['cover_url'] = $defaultCover;
         }
 
         $category = Category::find($validated['category_id']);

@@ -763,7 +763,11 @@
                 </button>
             </div>
 
-            <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route('admin.books.store') }}" 
+                  method="POST" 
+                  enctype="multipart/form-data" 
+                  onsubmit="const f = this.querySelector('input[name=cover_file]').files.length; const u = this.querySelector('input[name=cover_url]').value.trim(); if (!f && !u) { alert('Gambar sampul buku wajib ditambahkan! Silakan upload file gambar atau isi URL gambar.'); return false; }"
+                  class="space-y-4">
                 @csrf
 
                 <div>
@@ -807,11 +811,18 @@
                     </div>
                 </div>
 
-                <!-- Cover Image (Upload or URL) with Live Preview -->
-                <div class="bg-[#26211A] p-3.5 rounded-2xl border border-[#3D352A] space-y-3">
+                <!-- Cover Image (Upload or URL) with Live Preview (Required) -->
+                <div class="bg-[#26211A] p-3.5 rounded-2xl border @if($errors->has('cover_file') || $errors->has('cover_url')) border-red-500 @else border-[#3D352A] @endif space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-semibold text-amber-300">
+                            Gambar Sampul Buku (Wajib) <span class="text-red-400">*</span>
+                        </label>
+                        <span class="text-[10px] text-[#A69785]">Pilih salah satu: upload berkas atau isi URL</span>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-amber-300 mb-1">Upload Berkas Sampul (Storage)</label>
+                            <label class="block text-[11px] font-medium text-[#D4C7B8] mb-1">1. Upload Berkas Gambar (Storage)</label>
                             <input type="file" 
                                    name="cover_file" 
                                    accept="image/*" 
@@ -819,14 +830,23 @@
                                    class="w-full text-xs text-[#A69785] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#3D352A] file:text-amber-300 hover:file:bg-[#4D4336] cursor-pointer">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-amber-300 mb-1">Atau Gunakan URL Gambar</label>
+                            <label class="block text-[11px] font-medium text-[#D4C7B8] mb-1">2. Atau Gunakan URL Gambar</label>
                             <input type="url" 
                                    name="cover_url" 
+                                   value="{{ old('cover_url') }}"
                                    @input="createCoverPreview = $event.target.value"
                                    placeholder="https://images.unsplash.com/..." 
                                    class="w-full px-3 py-1.5 bg-[#1C1915] border border-[#3D352A] rounded-xl text-xs text-white placeholder-[#786C5E] focus:outline-none focus:border-amber-400">
                         </div>
                     </div>
+
+                    @if($errors->has('cover_file') || $errors->has('cover_url'))
+                        <div class="p-2.5 bg-red-950/60 border border-red-500/40 rounded-xl text-red-300 text-[11px] font-medium flex items-center gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-red-400 shrink-0"></i>
+                            <span>{{ $errors->first('cover_file') ?: $errors->first('cover_url') }}</span>
+                        </div>
+                    @endif
+
                     <div x-show="createCoverPreview" class="pt-2 border-t border-[#332C23] flex items-center gap-3">
                         <img :src="createCoverPreview" class="w-12 h-16 object-cover rounded-lg border border-[#4D4336] bg-[#151311] shadow-xs" alt="Preview Sampul">
                         <div>
