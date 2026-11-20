@@ -168,4 +168,20 @@ class RoleBoundaryBarrierTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/users');
         $response->assertRedirect(route('admin.dashboard', ['tab' => 'users']));
     }
+
+    /**
+     * Test that Unauthenticated Guest visiting /admin routes is aborted with 403 Forbidden.
+     */
+    public function test_guest_visiting_admin_is_blocked_with_403()
+    {
+        // Visiting /admin as guest returns 403 Forbidden
+        $response = $this->get('/admin');
+        $response->assertStatus(403);
+        $response->assertSee('Wilayah Terbatas Kurator');
+        $response->assertSee('403');
+
+        // Visiting /admin/books as guest returns 403 Forbidden
+        $responseBooks = $this->get('/admin/books');
+        $responseBooks->assertStatus(403);
+    }
 }

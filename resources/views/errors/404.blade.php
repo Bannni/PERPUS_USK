@@ -26,20 +26,15 @@
             </span>
         </div>
 
-        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#4A3222]">Lembaran yang Hilang</h1>
-        <p class="text-xs sm:text-sm text-[#7A6B60] mt-3 mb-8 leading-relaxed">
-            Halaman atau buku yang Anda tuju sepertinya telah dipindahkan ke rak lain atau tautannya sudah tidak tersedia.
-        </p>
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#4A3222]">Akses tidak disetujui</h1>
+        
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="{{ route('home') }}" class="w-full sm:w-auto px-6 py-3 bg-[#1C1815] hover:bg-black text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
                 <i data-lucide="home" class="w-4 h-4"></i>
                 <span>Kembali ke Beranda</span>
             </a>
-            <a href="{{ route('shop') }}" class="w-full sm:w-auto px-6 py-3 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                <span>Jelajahi Toko Buku</span>
-            </a>
+            
         </div>
     </main>
 

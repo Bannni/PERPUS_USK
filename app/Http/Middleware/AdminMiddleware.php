@@ -17,7 +17,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Silakan masuk terlebih dahulu untuk mengakses halaman administrator.');
+            abort(403, 'Akses ditolak! Halaman administrator ini dilindungi dan hanya dapat diakses oleh Administrator.');
         }
 
         if (!Auth::user()->isAdmin()) {

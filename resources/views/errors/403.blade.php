@@ -36,10 +36,17 @@
                 <i data-lucide="home" class="w-4 h-4"></i>
                 <span>Kembali ke Beranda</span>
             </a>
-            <a href="{{ route('catalog') }}" class="w-full sm:w-auto px-6 py-3 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span>Buka My Library</span>
-            </a>
+            @auth
+                <a href="{{ route('catalog') }}" class="w-full sm:w-auto px-6 py-3 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>Buka My Library</span>
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="w-full sm:w-auto px-6 py-3 bg-[#7A5034] hover:bg-[#5F3D27] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Login Administrator</span>
+                </a>
+            @endauth
         </div>
     </main>
 

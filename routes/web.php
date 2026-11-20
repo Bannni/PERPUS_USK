@@ -87,7 +87,7 @@ Route::middleware(['auth', 'user'])->group(function () {
 | Admin Protected Routes (Role: Admin)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
     // Admin Unified Dashboard
     Route::get('/', [AdminBookController::class, 'index'])->name('dashboard');
 
