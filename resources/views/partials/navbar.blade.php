@@ -93,14 +93,13 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" 
-                                class="p-2 text-[#9C8B7E] hover:text-red-600 hover:bg-[#F2EAE0] rounded-xl transition" 
-                                title="Keluar dari Akun">
-                            <i data-lucide="log-out" class="w-4 h-4"></i>
-                        </button>
-                    </form>
+                    <button type="button" 
+                            @click="$dispatch('open-logout-modal')"
+                            onclick="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
+                            class="p-2 text-[#9C8B7E] hover:text-red-600 hover:bg-[#F2EAE0] rounded-xl transition cursor-pointer" 
+                            title="Keluar dari Akun">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </button>
                 </div>
             @else
                 <a href="{{ route('login') }}" class="px-4 py-2 text-xs font-semibold text-[#5F3D27] hover:bg-[#EFE4D6] rounded-xl transition">
@@ -168,6 +167,13 @@
                         </span>
                     @endif
                 </a>
+                <button type="button" 
+                        @click="$dispatch('open-logout-modal')"
+                        onclick="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
+                        class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 transition cursor-pointer">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span>Keluar dari Akun</span>
+                </button>
             </div>
         @endauth
     </div>

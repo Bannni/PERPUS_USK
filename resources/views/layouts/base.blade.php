@@ -160,6 +160,90 @@
 <body class="min-h-screen bg-[#FAF8F5] text-[#2D231E] antialiased">
     @yield('content')
 
+    @auth
+        @if(request()->routeIs('admin*'))
+            <!-- ADMIN LOGOUT CONFIRMATION MODAL (Dark Theme) -->
+            <div x-data="{ logoutModalOpen: false }" 
+                 @open-logout-modal.window="logoutModalOpen = true; $nextTick(() => window.lucide && lucide.createIcons())"
+                 x-cloak>
+                <div x-show="logoutModalOpen" 
+                     style="display: none;"
+                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                     @keydown.escape.window="logoutModalOpen = false">
+                    
+                    <div class="bg-[#1C1915] border border-red-500/30 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center"
+                         @click.away="logoutModalOpen = false">
+                        
+                        <div class="w-14 h-14 rounded-full bg-red-950/70 border border-red-500/40 mx-auto flex items-center justify-center text-red-400 mb-4">
+                            <i data-lucide="log-out" class="w-7 h-7"></i>
+                        </div>
+
+                        <h3 class="font-serif text-xl font-bold text-white">Keluar dari Panel Admin?</h3>
+                        <p class="text-xs text-[#8E8070] mt-2 mb-6">
+                            Apakah Anda yakin ingin mengakhiri sesi Administrator (<strong>{{ Auth::user()->name }}</strong>)? Anda harus login kembali untuk mengelola inventaris buku dan pesanan.
+                        </p>
+
+                        <div class="flex gap-3 justify-center">
+                            <button type="button" 
+                                    @click="logoutModalOpen = false" 
+                                    class="px-5 py-2.5 text-xs font-semibold text-[#A69785] bg-[#26211C] hover:bg-[#332C24] rounded-xl transition">
+                                Batal
+                            </button>
+                            <form action="{{ route('logout') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" 
+                                        class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                                    <span>Ya, Keluar</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <!-- USER LOGOUT CONFIRMATION MODAL (Warm Aesthetic) -->
+            <div x-data="{ logoutModalOpen: false }" 
+                 @open-logout-modal.window="logoutModalOpen = true; $nextTick(() => window.lucide && lucide.createIcons())"
+                 x-cloak>
+                <div x-show="logoutModalOpen" 
+                     style="display: none;"
+                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
+                     @keydown.escape.window="logoutModalOpen = false">
+                    
+                    <div class="bg-[#FAF7F2] border border-[#E7DBCB] text-[#2D231E] rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center relative"
+                         @click.away="logoutModalOpen = false">
+                        
+                        <div class="w-14 h-14 rounded-full bg-red-100 border border-red-300 mx-auto flex items-center justify-center text-red-600 mb-4 shadow-sm">
+                            <i data-lucide="log-out" class="w-7 h-7"></i>
+                        </div>
+
+                        <h3 class="font-serif text-xl font-bold text-[#4A3222]">Keluar dari Akun?</h3>
+                        <p class="text-xs text-[#7A6B60] mt-2 mb-6">
+                            Apakah Anda yakin ingin keluar dari akun <strong>{{ Auth::user()->name }}</strong>? Anda harus masuk kembali untuk mengakses keranjang belanja dan rak buku pribadi Anda.
+                        </p>
+
+                        <div class="flex gap-3 justify-center">
+                            <button type="button" 
+                                    @click="logoutModalOpen = false" 
+                                    class="px-5 py-2.5 text-xs font-semibold text-[#5F3D27] bg-[#EFE4D6] hover:bg-[#E5D7C5] rounded-xl transition">
+                                Batal
+                            </button>
+                            <form action="{{ route('logout') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" 
+                                        class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5">
+                                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                                    <span>Ya, Keluar</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endauth
+
     <script>
         const initLucide = () => {
             if (window.lucide) {

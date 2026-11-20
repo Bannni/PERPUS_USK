@@ -112,12 +112,13 @@
                     <span class="hidden md:inline">Tambah Buku</span>
                 </button>
 
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" title="Keluar dari Panel Admin" class="p-2 text-[#9E9081] hover:text-red-400 hover:bg-[#26211C] rounded-xl transition">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
-                </form>
+                <button type="button" 
+                        @click="$dispatch('open-logout-modal')"
+                        onclick="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
+                        title="Keluar dari Panel Admin" 
+                        class="p-2 text-[#9E9081] hover:text-red-400 hover:bg-[#26211C] rounded-xl transition cursor-pointer">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
             </div>
         </div>
     </header>

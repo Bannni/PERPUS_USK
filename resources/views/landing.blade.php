@@ -45,13 +45,13 @@
                             Rak Buku
                         </a>
 
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="px-3 py-1.5 border border-[#DDD7CD] hover:border-red-300 hover:text-red-600 hover:bg-red-50/50 rounded-full text-xs font-semibold text-[#5C534B] transition flex items-center gap-1.5 cursor-pointer" title="Keluar">
-                                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                                <span class="hidden sm:inline">Keluar</span>
-                            </button>
-                        </form>
+                        <button type="button" 
+                                onclick="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
+                                class="px-3 py-1.5 border border-[#DDD7CD] hover:border-red-300 hover:text-red-600 hover:bg-red-50/50 rounded-full text-xs font-semibold text-[#5C534B] transition flex items-center gap-1.5 cursor-pointer" 
+                                title="Keluar">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                            <span class="hidden sm:inline">Keluar</span>
+                        </button>
                     @else
                         <a href="{{ route('login') }}" class="hover:text-[#1C1815] transition">Login</a>
                         <a href="{{ route('register') }}" class="px-4 py-1.5 bg-[#1C1815] text-[#F0EDE6] rounded-full text-xs font-semibold hover:bg-[#3D332B] transition">
@@ -317,10 +317,11 @@
                 @auth
                     <a href="{{ route('catalog') }}" class="hover:text-white transition">Rak Buku</a>
                     <a href="{{ route('orders.index') }}" class="hover:text-white transition">Pesanan</a>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="hover:text-red-400 transition cursor-pointer">Keluar</button>
-                    </form>
+                    <button type="button" 
+                            onclick="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
+                            class="hover:text-red-400 transition cursor-pointer">
+                        Keluar
+                    </button>
                 @else
                     <a href="{{ route('login') }}" class="hover:text-white transition">Masuk</a>
                     <a href="{{ route('register') }}" class="hover:text-white transition">Daftar</a>
